@@ -12,7 +12,7 @@ spring:
         use_sql_comments: true
   
   datasource:
-    url: jdbc:h2:mem:testdb
+    url: jdbc:h2:file:./data/passmate;AUTO_SERVER=TRUE
     driver-class-name: org.h2.Driver
     username: sa
     password:
@@ -30,3 +30,5 @@ logging:
   level:
     root: INFO
     com.passmate: DEBUG
+  pattern:
+    console: "%d{HH:mm:ss.SSS} %clr(%-5level) %clr([%15.15thread]){faint} %clr(%-36.36logger{36}){cyan} : %msg%n"

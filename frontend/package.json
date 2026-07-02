@@ -4,7 +4,9 @@
   "description": "PassMate frontend - Personal learning PWA",
   "private": true,
   "scripts": {
+    "predev": "node scripts/clean-next.mjs",
     "dev": "next dev",
+    "prebuild": "node scripts/clean-next.mjs",
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
