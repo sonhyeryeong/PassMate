@@ -53,9 +53,18 @@ npm.cmd install
 
 ### 1. 백엔드 실행
 
+프로젝트 루트(`D:\workspace\PassMate`)가 아니라 `backend` 폴더에서 실행합니다.
+
 ```powershell
 cd D:\workspace\PassMate\backend
 mvn spring-boot:run
+```
+
+프로젝트 루트에서 바로 실행하고 싶다면 `-f` 옵션으로 백엔드 `pom.xml`을 지정합니다.
+
+```powershell
+cd D:\workspace\PassMate
+mvn -f backend/pom.xml spring-boot:run
 ```
 
 백엔드 서버 주소:
@@ -177,6 +186,24 @@ PassMate/
 ### 8080 또는 3000 포트가 이미 사용 중인 경우
 
 이미 실행 중인 Spring Boot 또는 Next.js 프로세스를 종료한 뒤 다시 실행합니다.
+
+### No plugin found for prefix 'spring-boot' 에러가 나는 경우
+
+대부분 프로젝트 루트에서 `mvn spring-boot:run`을 실행했을 때 발생합니다.
+
+백엔드는 `backend/pom.xml`에 설정되어 있으므로 아래 둘 중 하나로 실행합니다.
+
+```powershell
+cd D:\workspace\PassMate\backend
+mvn spring-boot:run
+```
+
+또는
+
+```powershell
+cd D:\workspace\PassMate
+mvn -f backend/pom.xml spring-boot:run
+```
 
 ### Git에서 dubious ownership 경고가 나오는 경우
 

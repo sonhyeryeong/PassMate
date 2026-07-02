@@ -6,82 +6,110 @@
 
 프론트엔드 라우팅, 백엔드 API, 데이터 모델 설계의 기준으로 사용한다.
 
-## 최상위 정보 구조
+## UX 정보 구조
+
+사용자에게 보이는 정보 구조는 퀴즐렛식 학습 세트 중심으로 단순화한다.
 
 ```text
 PassMate
-  ├─ Deck
-  │   └─ Category
-  │       └─ Material
-  │           └─ FlashCard
+  ├─ Dashboard
+  ├─ 폴더
+  │   └─ 학습 세트
+  │       └─ 카드
   ├─ Review
   │   └─ ReviewHistory
   └─ MyPage
 ```
 
+## 내부 도메인 구조
+
+MVP1의 기존 내부 도메인은 아래 구조를 유지한다.
+
+```text
+User
+  └─ Deck(폴더)
+      └─ Category(기본 섹션 또는 내부 분류)
+          └─ Material(학습 세트)
+              └─ FlashCard(카드)
+                  └─ ReviewHistory
+```
+
+Category는 사용자가 반드시 직접 생성해야 하는 화면 단계가 아니다. MVP1에서는 기본 Category를 자동으로 만들거나, 폴더 내부의 숨겨진 기본 섹션으로 취급할 수 있다.
+
 ## 주요 메뉴
 
 MVP1의 주요 메뉴는 다음과 같다.
 
-- Deck
+- Dashboard
+- 폴더
 - Review
 - MyPage
 
-Material과 FlashCard는 독립 메뉴가 아니라 Deck과 Category 흐름 안에서 접근하는 것을 기본으로 한다.
+학습 세트와 카드는 독립 메뉴가 아니라 폴더 흐름 안에서 접근한다.
 
-## Deck
+## 폴더
 
-Deck은 사용자가 학습 주제를 관리하는 최상위 단위이다.
+폴더는 사용자가 학습 주제를 관리하는 최상위 단위이다.
 
-Deck에서 할 수 있는 일:
+내부 도메인으로는 Deck에 해당한다.
 
-- Deck 목록 조회
-- Deck 생성
-- Deck 상세 조회
-- Deck 수정
-- Deck 삭제
-- Deck 안의 Category 목록 확인
+폴더에서 할 수 있는 일:
 
-## Category
+- 폴더 목록 조회
+- 폴더 생성
+- 폴더 상세 조회
+- 폴더 수정
+- 폴더 삭제
+- 폴더 안의 학습 세트 목록 확인
 
-Category는 Deck 안에서 학습 범위를 나누는 단위이다.
+## 기본 섹션
 
-Category에서 할 수 있는 일:
+기본 섹션은 내부 도메인 Category에 해당한다.
 
-- Category 목록 조회
-- Category 생성
-- Category 수정
-- Category 삭제
-- Category 안의 Material 목록 확인
+MVP1에서는 사용자에게 필수 단계로 노출하지 않는다.
 
-## Material
+기본 섹션의 역할:
 
-Material은 학습 원본 자료이다.
+- 기존 `Deck → Category → Material` 구조를 유지하기 위한 내부 분류
+- 폴더 안의 학습 세트를 담는 기본 컨테이너
+- 이후 사용자가 더 세밀한 분류를 원할 때 고급 기능으로 확장 가능
 
-Material에서 할 수 있는 일:
+## 학습 세트
 
-- Material 목록 조회
-- Material 생성
-- Material 상세 조회
-- Material 수정
-- Material 삭제
-- Material 기반 FlashCard 목록 확인
+학습 세트는 사용자가 실제로 카드 묶음을 만들고 복습하는 기본 단위이다.
 
-## FlashCard
+내부 도메인으로는 Material에 해당한다.
 
-FlashCard는 Material에서 파생되는 학습 카드이다.
+학습 세트에서 할 수 있는 일:
 
-FlashCard에서 할 수 있는 일:
+- 학습 세트 목록 조회
+- 학습 세트 생성
+- 학습 세트 상세 조회
+- 학습 세트 수정
+- 학습 세트 삭제
+- 카드 목록 확인
+- 카드 빠른 생성/수정/삭제
+- 학습 세트 기준 복습 시작
 
-- FlashCard 생성
-- FlashCard 수정
-- FlashCard 삭제
+## 카드
+
+카드는 학습 세트에서 만들어지는 플래시카드이다.
+
+내부 도메인으로는 FlashCard에 해당한다.
+
+카드에서 할 수 있는 일:
+
+- 카드 생성
+- 카드 수정
+- 카드 삭제
 - 앞면과 뒷면 확인
 - 복습 대상 여부 확인
 
+카드는 학습 세트 없이 독립 생성하지 않는다.
+
 ## Review
 
-Review는 오늘 학습자가 복습해야 할 FlashCard를 보여주는 영역이다.
+Review는 오늘 학습자가 복습해야 할 카드를 보여주는 영역이다.
 
 Review에서 할 수 있는 일:
 
@@ -89,6 +117,19 @@ Review에서 할 수 있는 일:
 - 카드 앞면 보기
 - 카드 뒷면 보기
 - 복습 결과 제출
+- 복습 완료 상태 확인
+
+## ReviewHistory
+
+ReviewHistory는 복습 결과의 저장과 조회를 담당한다.
+
+ReviewHistory에서 할 수 있는 일:
+
+- 최근 복습 기록 조회
+- 카드 질문 확인
+- 복습 결과 확인
+- 복습 시간 확인
+- 폴더/학습 세트 기준 필터링
 
 ## MyPage
 
@@ -107,4 +148,3 @@ MVP1에서는 최소 범위만 구현한다.
 - Marketplace
 - Team
 - Payment
-

@@ -6,6 +6,23 @@
 
 상세 응답 형식과 에러 형식은 `API_STYLE.md`를 따른다.
 
+## 사용자 용어와 API 이름
+
+MVP1에서는 기존 API 경로와 내부 도메인 이름을 유지할 수 있다.
+
+사용자 화면에서는 아래 용어를 사용한다.
+
+```text
+Deck      → 폴더
+Category  → 기본 섹션 또는 내부 분류
+Material  → 학습 세트
+FlashCard → 카드
+```
+
+즉, 화면의 "폴더"는 내부적으로 Deck API를 사용할 수 있고, 화면의 "학습 세트"는 내부적으로 Material API를 사용할 수 있다.
+
+Category는 사용자 필수 단계로 노출하지 않는다. 프론트엔드 또는 백엔드는 폴더별 기본 Category를 사용해 학습 세트를 생성할 수 있다.
+
 ## Deck API
 
 ```text
@@ -86,4 +103,3 @@ GET /api/users/me
 - Quiz API
 - 결제 API
 - 공유 Deck API
-

@@ -13,6 +13,11 @@
 - 비즈니스 로직과 API 호출은 hooks 또는 lib 계층으로 분리한다.
 - 로딩, 빈 상태, 에러 상태, 성공 상태를 반드시 고려한다.
 - 접근성 좋은 기본 HTML과 명확한 사용자 흐름을 우선한다.
+- PassMate는 모바일 앱 화면이 아니라 PWA 기반 웹 서비스 화면을 우선한다.
+- 자료 입력과 관리는 데스크톱 웹에서 주로 사용한다고 가정한다.
+- 모바일 PWA는 오늘의 복습, Deck 조회, MyPage 중심으로 축소한다.
+- 사용자 화면에서는 Deck보다 폴더, Material보다 학습 세트, FlashCard보다 카드를 우선 사용한다.
+- 카드 생성 UX는 퀴즐렛처럼 앞면/뒷면 카드 행을 빠르게 여러 개 추가하는 흐름을 우선한다.
 
 ## 페이지 구조
 
@@ -20,15 +25,32 @@
 
 ```text
 app/
-  deck/
-  category/
+  page.tsx
+  folder/
   review/
-  material/
-  card/
   mypage/
 ```
 
 라우트 이름은 사용자의 작업 흐름과 도메인을 기준으로 짓는다.
+
+`page.tsx`는 Dashboard로 사용한다.
+
+학습 세트와 카드는 독립 최상위 메뉴나 독립 최상위 라우트로 만들지 않는다. 아래처럼 폴더 상세 흐름 안에서 접근한다.
+
+```text
+app/
+  folder/
+    page.tsx
+    [folderId]/
+      page.tsx
+      set/
+        new/
+          page.tsx
+        [setId]/
+          page.tsx
+          edit/
+            page.tsx
+```
 
 ## 추천 폴더 구조
 
@@ -38,6 +60,12 @@ app/
 src/
   app/
   components/
+    layout/
+    folder/
+    study-set/
+    flashcard/
+    review/
+    common/
   features/
   hooks/
   lib/
@@ -47,10 +75,25 @@ src/
 
 - `app`: 라우팅과 페이지 엔트리
 - `components`: 공용 UI 컴포넌트
+- `components/layout`: AppShell, Header, Sidebar, MobileBottomNav, PageHeader, Breadcrumb
 - `features`: 도메인 또는 기능별 UI와 로직
 - `hooks`: 재사용 가능한 클라이언트 로직
 - `lib`: API client, 유틸, 설정
 - `types`: 공용 타입
+
+## 화면 레이아웃
+
+- 기준 화면은 1440px 데스크톱 웹이다.
+- 데스크톱 기본 구조는 Header, Sidebar, Main Content이다.
+- 주요 메뉴는 Dashboard, 폴더, Review, MyPage이다.
+- Notion, Linear, GitHub Projects처럼 관리형 웹 서비스 느낌을 우선한다.
+- 데스크톱에서는 넓은 작업 공간을 활용하고, 한 줄 모바일 카드 나열처럼 보이지 않게 한다.
+- Sidebar는 데스크톱에서 표시하고 모바일에서는 숨긴다.
+- 모바일에서는 Bottom Navigation을 사용할 수 있다.
+- Review 화면은 웹과 모바일 모두에서 카드 중심으로 단순하게 유지한다.
+- 학습 세트 생성/수정은 카드 앞면/뒷면을 여러 행으로 입력하는 테이블형 편집 UI를 우선한다.
+- 카드 단일 생성/수정은 데스크톱에서 모달 또는 우측 패널을 우선한다.
+- 카드를 학습 세트 없이 독립 생성하는 흐름은 만들지 않는다.
 
 ## 컴포넌트
 
@@ -117,4 +160,3 @@ src/
 - 중요한 컴포넌트 동작은 컴포넌트 테스트를 고려한다.
 - 데이터 변환, 복습 로직 등 순수 로직은 단위 테스트를 작성한다.
 - UI 변경은 가능한 경우 브라우저에서 직접 확인한다.
-

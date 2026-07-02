@@ -95,6 +95,7 @@ a {
   display: grid;
   gap: 18px;
   padding: 16px 14px 28px;
+  width: 100%;
 }
 
 .page--with-nav {
@@ -489,7 +490,7 @@ a {
   color: #2f67f6;
 }
 
-@media (min-width: 520px) {
+@media (min-width: 520px) and (max-width: 899px) {
   .app-shell {
     max-width: 430px;
     margin: 0 auto;
@@ -503,5 +504,160 @@ a {
     left: 50%;
     width: 430px;
     transform: translateX(-50%);
+  }
+}
+
+@media (min-width: 900px) {
+  body {
+    background: #f2f5fa;
+  }
+
+  .app-shell {
+    min-height: 100vh;
+    background:
+      linear-gradient(90deg, #ffffff 0, #ffffff 220px, transparent 220px),
+      #f2f5fa;
+  }
+
+  .top-bar {
+    margin-left: 220px;
+  }
+
+  .top-bar__inner {
+    min-height: 72px;
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 14px 32px;
+  }
+
+  .brand__caption {
+    font-size: 13px;
+  }
+
+  .brand__name,
+  .screen-title {
+    font-size: 22px;
+  }
+
+  .page {
+    grid-template-columns: minmax(280px, 380px) minmax(0, 1fr);
+    align-items: start;
+    gap: 24px;
+    max-width: 1280px;
+    margin: 0 auto;
+    margin-left: calc(220px + max(32px, (100vw - 220px - 1280px) / 2));
+    padding: 28px 32px 48px;
+  }
+
+  .page--with-nav {
+    padding-bottom: 48px;
+  }
+
+  .page > .detail-card,
+  .page > .status-box,
+  .page > .empty-state {
+    grid-column: 1 / -1;
+  }
+
+  .start-panel,
+  .detail-card,
+  .deck-form,
+  .empty-state,
+  .status-box {
+    padding: 22px;
+  }
+
+  .start-panel h2,
+  .deck-form h2,
+  .detail-card h2,
+  .section-heading h2 {
+    font-size: 20px;
+  }
+
+  .panel-copy,
+  .section-heading p,
+  .detail-card p,
+  .form-help,
+  .empty-state p,
+  .status-box p {
+    font-size: 14px;
+  }
+
+  .deck-form {
+    position: sticky;
+    top: 96px;
+  }
+
+  .section-heading {
+    min-height: 52px;
+  }
+
+  .deck-list,
+  .category-list,
+  .material-list {
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 12px;
+  }
+
+  .user-list {
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 12px;
+  }
+
+  .list-card {
+    min-height: 92px;
+    padding: 16px;
+  }
+
+  .flashcard-list {
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 12px;
+  }
+
+  .bottom-nav {
+    top: 0;
+    right: auto;
+    bottom: 0;
+    left: 0;
+    grid-template-columns: 1fr;
+    align-content: start;
+    gap: 6px;
+    width: 220px;
+    border-top: 0;
+    border-right: 1px solid #dfe5ee;
+    background: #ffffff;
+    padding: 92px 16px 24px;
+  }
+
+  .bottom-nav::before {
+    content: "PassMate";
+    position: absolute;
+    top: 24px;
+    left: 20px;
+    color: #111827;
+    font-size: 20px;
+    font-weight: 800;
+  }
+
+  .bottom-nav__item {
+    grid-template-columns: 24px minmax(0, 1fr);
+    justify-items: start;
+    align-items: center;
+    border-radius: 8px;
+    padding: 12px;
+    font-size: 14px;
+  }
+
+  .bottom-nav__item:hover {
+    background: #f5f7fb;
+  }
+
+  .bottom-nav__item--active {
+    background: #eef4ff;
+  }
+
+  .bottom-nav__icon {
+    width: 20px;
+    height: 20px;
   }
 }
