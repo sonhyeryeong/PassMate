@@ -84,7 +84,7 @@ export default function Home() {
       setDeckLoadState('success');
     } catch {
       setDeckLoadState('error');
-      setDeckMessage('덱 목록을 불러오지 못했습니다. 백엔드 서버 상태를 확인해 주세요.');
+      setDeckMessage('폴더 목록을 불러오지 못했습니다. 백엔드 서버 상태를 확인해 주세요.');
     }
   }
 
@@ -148,7 +148,7 @@ export default function Home() {
     const trimmedDescription = deckDescription.trim();
 
     if (!trimmedName) {
-      setDeckNameError('덱 이름을 입력해 주세요.');
+      setDeckNameError('폴더 이름을 입력해 주세요.');
       return;
     }
 
@@ -166,9 +166,9 @@ export default function Home() {
       setDeckName('');
       setDeckDescription('');
       setDeckLoadState('success');
-      setDeckMessage('덱을 만들었습니다.');
+      setDeckMessage('폴더를 만들었습니다.');
     } catch {
-      setDeckMessage('덱을 만들지 못했습니다. 입력값과 서버 상태를 확인해 주세요.');
+      setDeckMessage('폴더를 만들지 못했습니다. 입력값과 서버 상태를 확인해 주세요.');
     } finally {
       setDeckSubmitState('idle');
     }
@@ -190,7 +190,7 @@ export default function Home() {
           <section className="start-panel" aria-labelledby="start-title">
             <h2 id="start-title">새 사용자</h2>
             <p className="panel-copy">
-              MVP 단계에서는 간단한 사용자 선택으로 학습 덱을 관리합니다.
+              MVP 단계에서는 간단한 사용자 선택으로 학습 폴더를 관리합니다.
             </p>
 
             <form className="user-form" onSubmit={handleCreateUser}>
@@ -260,7 +260,7 @@ export default function Home() {
             {userLoadState === 'success' && users.length === 0 && (
               <div className="empty-state">
                 <h3>아직 사용자가 없습니다</h3>
-                <p>첫 사용자를 만들면 덱 목록으로 이동합니다.</p>
+                <p>첫 사용자를 만들면 폴더 목록으로 이동합니다.</p>
               </div>
             )}
 
@@ -291,7 +291,7 @@ export default function Home() {
         <div className="top-bar__inner">
           <div className="brand">
             <p className="brand__caption">{selectedUser.nickname}</p>
-            <h1 className="brand__name">덱</h1>
+            <h1 className="brand__name">폴더</h1>
           </div>
           <button className="icon-button" onClick={switchUser} type="button" aria-label="사용자 변경">
             변경
@@ -301,9 +301,9 @@ export default function Home() {
 
       <main className="page page--with-nav">
         <form className="deck-form primary-form" onSubmit={handleCreateDeck}>
-          <h2>새 덱 만들기</h2>
+          <h2>새 폴더 만들기</h2>
           <div className="form-field">
-            <label htmlFor="deck-name">덱 이름</label>
+            <label htmlFor="deck-name">폴더 이름</label>
             <input
               id="deck-name"
               maxLength={80}
@@ -320,7 +320,7 @@ export default function Home() {
               id="deck-description"
               maxLength={300}
               onChange={(event) => setDeckDescription(event.target.value)}
-              placeholder="이 덱에서 공부할 내용을 적어 주세요."
+              placeholder="이 폴더에서 공부할 내용을 적어 주세요."
               value={deckDescription}
             />
           </div>
@@ -330,7 +330,7 @@ export default function Home() {
             disabled={deckSubmitState === 'submitting'}
             type="submit"
           >
-            {deckSubmitState === 'submitting' ? '만드는 중' : '+ 새 덱 만들기'}
+            {deckSubmitState === 'submitting' ? '만드는 중' : '+ 새 폴더 만들기'}
           </button>
 
           {deckMessage && deckLoadState !== 'error' && <p className="form-help">{deckMessage}</p>}
@@ -339,30 +339,30 @@ export default function Home() {
         <section aria-labelledby="deck-list-title">
           <div className="section-heading">
             <div>
-              <h2 id="deck-list-title">덱 목록</h2>
-              <p>학습 자료를 주제별 덱으로 관리합니다.</p>
+              <h2 id="deck-list-title">폴더 목록</h2>
+              <p>학습 자료를 주제별 폴더로 관리합니다.</p>
             </div>
             <span className="deck-count">{decks.length}개</span>
           </div>
 
           {deckLoadState === 'loading' && (
             <div className="status-box" role="status">
-              <h3>덱을 불러오는 중</h3>
-              <p>저장된 덱 목록을 준비하고 있습니다.</p>
+              <h3>폴더를 불러오는 중</h3>
+              <p>저장된 폴더 목록을 준비하고 있습니다.</p>
             </div>
           )}
 
           {deckLoadState === 'error' && (
             <div className="status-box error-box" role="alert">
-              <h3>덱을 볼 수 없습니다</h3>
+              <h3>폴더를 볼 수 없습니다</h3>
               <p>{deckMessage}</p>
             </div>
           )}
 
           {deckLoadState === 'success' && decks.length === 0 && (
             <div className="empty-state">
-              <h3>아직 덱이 없습니다</h3>
-              <p>첫 학습 덱을 만들면 여기에 표시됩니다.</p>
+              <h3>아직 폴더가 없습니다</h3>
+              <p>첫 학습 폴더를 만들면 여기에 표시됩니다.</p>
             </div>
           )}
 

@@ -15,3 +15,8 @@ export interface CreateMaterialRequest {
   title: string;
   content?: string;
 }
+
+export interface UpdateMaterialRequest {
+  title: string;
+  content?: string;
+}

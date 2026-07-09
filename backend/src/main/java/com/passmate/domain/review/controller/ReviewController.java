@@ -31,7 +31,15 @@ public class ReviewController {
     }
 
     @GetMapping("/users/{userId}/today")
-    public ResponseEntity<ReviewDto.UserReviewListResponse> getUserTodayReviews(
+    public ResponseEntity<ReviewDto.TodayReviewResponse> getUserTodayReviews(
+            @PathVariable Long userId,
+            @RequestParam(required = false) LocalDateTime date) {
+        LocalDateTime reviewDate = date != null ? date : LocalDateTime.now();
+        return ResponseEntity.ok(reviewService.getUserTodayReviewCards(userId, reviewDate));
+    }
+
+    @GetMapping("/users/{userId}/history/today")
+    public ResponseEntity<ReviewDto.UserReviewListResponse> getUserTodayReviewHistory(
             @PathVariable Long userId,
             @RequestParam(required = false) LocalDateTime date) {
         LocalDateTime reviewDate = date != null ? date : LocalDateTime.now();

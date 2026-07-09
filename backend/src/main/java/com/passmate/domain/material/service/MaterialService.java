@@ -3,6 +3,7 @@ package com.passmate.domain.material.service;
 import com.passmate.domain.material.dto.MaterialDto;
 import com.passmate.domain.material.entity.Material;
 import com.passmate.domain.material.repository.MaterialRepository;
+import com.passmate.domain.flashcard.repository.FlashCardRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -15,6 +16,7 @@ import java.util.stream.Collectors;
 public class MaterialService {
 
     private final MaterialRepository materialRepository;
+    private final FlashCardRepository flashCardRepository;
 
     public MaterialDto.Response getMaterial(Long materialId, Long categoryId) {
         Material material = materialRepository.findByIdAndCategoryId(materialId, categoryId)
@@ -58,6 +60,7 @@ public class MaterialService {
     public void deleteMaterial(Long materialId, Long categoryId) {
         Material material = materialRepository.findByIdAndCategoryId(materialId, categoryId)
                 .orElseThrow(() -> new IllegalArgumentException("Material not found"));
+        flashCardRepository.deleteByMaterialId(materialId);
         materialRepository.delete(material);
     }
 

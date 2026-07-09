@@ -1,5 +1,6 @@
 package com.passmate.domain.review.dto;
 
+import com.passmate.domain.flashcard.dto.FlashCardDto;
 import com.passmate.domain.review.entity.ReviewResult;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -47,5 +48,14 @@ public class ReviewDto {
     public static class UserReviewListResponse {
         private List<Response> items;
         private LocalDateTime reviewedDate;
+    }
+
+    @Getter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    @Builder
+    public static class TodayReviewResponse {
+        private List<FlashCardDto.Response> items;
+        private LocalDateTime reviewDate;
     }
 }

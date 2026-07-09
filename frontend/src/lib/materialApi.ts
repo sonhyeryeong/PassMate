@@ -2,6 +2,7 @@ import type {
   CreateMaterialRequest,
   Material,
   MaterialListResponse,
+  UpdateMaterialRequest,
 } from '@/types/material';
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL ?? 'http://localhost:8080/api';
@@ -39,4 +40,25 @@ export async function createMaterial(
     method: 'POST',
     body: JSON.stringify(payload),
   });
+}
+
+export async function updateMaterial(
+  categoryId: number,
+  materialId: number,
+  payload: UpdateMaterialRequest,
+): Promise<Material> {
+  return request<Material>(`/categories/${categoryId}/materials/${materialId}`, {
+    method: 'PATCH',
+    body: JSON.stringify(payload),
+  });
+}
+
+export async function deleteMaterial(categoryId: number, materialId: number): Promise<void> {
+  const response = await fetch(`${API_BASE_URL}/categories/${categoryId}/materials/${materialId}`, {
+    method: 'DELETE',
+  });
+
+  if (!response.ok) {
+    throw new Error('요청을 처리하지 못했습니다. 잠시 후 다시 시도해 주세요.');
+  }
 }

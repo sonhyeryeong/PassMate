@@ -1,4 +1,5 @@
-import type { CreateUserRequest, User, UserListResponse } from '@/types/user';
+import type { CreateReviewRequest, Review, TodayReviewResponse } from '@/types/review';
+import type { FlashCard } from '@/types/flashcard';
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL ?? 'http://localhost:8080/api';
 
@@ -18,17 +19,17 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
   return response.json() as Promise<T>;
 }
 
-export async function getUsers(): Promise<User[]> {
-  const data = await request<UserListResponse>('/users');
+export async function getTodayReviewCards(userId: number): Promise<FlashCard[]> {
+  const data = await request<TodayReviewResponse>(`/reviews/users/${userId}/today`);
   return data.items;
 }
 
-export async function getUser(userId: number): Promise<User> {
-  return request<User>(`/users/${userId}`);
-}
-
-export async function createUser(payload: CreateUserRequest): Promise<User> {
-  return request<User>('/users', {
+export async function createReview(
+  userId: number,
+  cardId: number,
+  payload: CreateReviewRequest,
+): Promise<Review> {
+  return request<Review>(`/reviews/cards/${cardId}?userId=${userId}`, {
     method: 'POST',
     body: JSON.stringify(payload),
   });

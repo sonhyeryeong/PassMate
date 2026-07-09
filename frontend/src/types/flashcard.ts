@@ -16,3 +16,8 @@ export interface CreateFlashCardRequest {
   front: string;
   back: string;
 }
+
+export interface UpdateFlashCardRequest {
+  front: string;
+  back: string;
+}

@@ -7,9 +7,9 @@ interface BottomNavProps {
 }
 
 const items: Array<{ key: NavKey; label: string; href: string }> = [
-  { key: 'deck', label: '덱', href: '/' },
-  { key: 'review', label: '복습', href: '/' },
-  { key: 'mypage', label: '마이', href: '/' },
+  { key: 'deck', label: '폴더', href: '/' },
+  { key: 'review', label: '복습', href: '/review' },
+  { key: 'mypage', label: '마이', href: '/mypage' },
 ];
 
 export function BottomNav({ active }: BottomNavProps) {
