@@ -111,7 +111,7 @@ docs/architecture/
 - 백엔드 작업은 `SPRING.md`를 따른다.
 - 프론트엔드 작업은 `FRONTEND.md`를 따른다.
 - API 설계와 응답 형식은 `API_STYLE.md`를 따른다.
-- Git 작업은 `GIT.md`를 따른다.
+- Git 작업과 한국어 커밋 메시지 작성은 `GIT.md`를 따른다.
 
 ## PassMate 작업 완료 기준
 
