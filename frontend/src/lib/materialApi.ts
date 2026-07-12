@@ -1,7 +1,9 @@
 import type {
   CreateMaterialRequest,
+  CreateMaterialWithCardsRequest,
   Material,
   MaterialListResponse,
+  MaterialWithCardsResponse,
   UpdateMaterialRequest,
 } from '@/types/material';
 
@@ -37,6 +39,16 @@ export async function createMaterial(
   payload: CreateMaterialRequest,
 ): Promise<Material> {
   return request<Material>(`/categories/${categoryId}/materials`, {
+    method: 'POST',
+    body: JSON.stringify(payload),
+  });
+}
+
+export async function createMaterialWithCards(
+  categoryId: number,
+  payload: CreateMaterialWithCardsRequest,
+): Promise<MaterialWithCardsResponse> {
+  return request<MaterialWithCardsResponse>(`/categories/${categoryId}/materials/with-cards`, {
     method: 'POST',
     body: JSON.stringify(payload),
   });

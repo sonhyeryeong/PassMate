@@ -1,15 +1,9 @@
-'use client';
+import { redirect } from 'next/navigation';
 
-import { useEffect } from 'react';
-import { useParams, useRouter } from 'next/navigation';
-
-export default function CategoryRedirectPage() {
-  const params = useParams<{ deckId: string }>();
-  const router = useRouter();
-
-  useEffect(() => {
-    router.replace(`/deck/${params.deckId}`);
-  }, [params.deckId, router]);
-
-  return null;
+export default function LegacyCategoryRedirectPage({
+  params,
+}: {
+  params: { deckId: string };
+}) {
+  redirect(`/folder/${params.deckId}`);
 }

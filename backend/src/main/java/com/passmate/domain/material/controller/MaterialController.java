@@ -35,6 +35,14 @@ public class MaterialController {
                 .body(materialService.createMaterial(categoryId, request));
     }
 
+    @PostMapping("/with-cards")
+    public ResponseEntity<MaterialDto.WithCardsResponse> createMaterialWithCards(
+            @PathVariable Long categoryId,
+            @RequestBody MaterialDto.CreateWithCardsRequest request) {
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(materialService.createMaterialWithCards(categoryId, request));
+    }
+
     @PatchMapping("/{materialId}")
     public ResponseEntity<MaterialDto.Response> updateMaterial(
             @PathVariable Long categoryId,

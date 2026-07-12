@@ -1,5 +1,6 @@
 package com.passmate.domain.material.dto;
 
+import com.passmate.domain.flashcard.dto.FlashCardDto;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -16,6 +17,16 @@ public class MaterialDto {
     public static class CreateRequest {
         private String title;
         private String content;
+    }
+
+    @Getter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    @Builder
+    public static class CreateWithCardsRequest {
+        private String title;
+        private String content;
+        private List<FlashCardDto.CreateRequest> cards;
     }
 
     @Getter
@@ -46,5 +57,14 @@ public class MaterialDto {
     @Builder
     public static class ListResponse {
         private List<Response> items;
+    }
+
+    @Getter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    @Builder
+    public static class WithCardsResponse {
+        private Response material;
+        private List<FlashCardDto.Response> cards;
     }
 }

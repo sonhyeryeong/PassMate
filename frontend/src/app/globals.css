@@ -33,6 +33,170 @@ a {
   color: inherit;
 }
 
+.app-layout {
+  min-height: 100vh;
+  background: #f4f6fa;
+}
+
+.sidebar {
+  display: none;
+}
+
+.workspace {
+  min-height: 100vh;
+}
+
+.workspace-header {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  border-bottom: 1px solid #dfe5ee;
+  background: rgba(255, 255, 255, 0.96);
+  padding: 14px 18px;
+}
+
+.workspace-header h1 {
+  margin: 0;
+  color: #111827;
+  font-size: 22px;
+  font-weight: 800;
+  letter-spacing: 0;
+}
+
+.workspace-header__eyebrow {
+  margin: 0 0 4px;
+  color: #667085;
+  font-size: 13px;
+  line-height: 1.25;
+}
+
+.workspace-header__actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.workspace-main {
+  display: grid;
+  gap: 22px;
+  padding: 18px 14px 96px;
+}
+
+.workspace-grid {
+  display: grid;
+  gap: 18px;
+}
+
+.stack-layout {
+  display: grid;
+  gap: 18px;
+}
+
+.surface-panel,
+.stat-card {
+  border: 1px solid #dfe5ee;
+  border-radius: 8px;
+  background: #ffffff;
+  box-shadow: 0 6px 20px rgba(34, 51, 84, 0.06);
+}
+
+.surface-panel {
+  padding: 18px;
+}
+
+.surface-panel h2,
+.stat-card strong {
+  margin: 0;
+  color: #111827;
+  font-size: 18px;
+  font-weight: 800;
+  letter-spacing: 0;
+}
+
+.surface-panel p {
+  margin: 8px 0 0;
+  color: #667085;
+  font-size: 13px;
+  line-height: 1.55;
+}
+
+.dashboard-stats {
+  display: grid;
+  gap: 12px;
+}
+
+.stat-card {
+  display: grid;
+  gap: 8px;
+  min-height: 112px;
+  padding: 18px;
+}
+
+.stat-card span {
+  color: #667085;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.stat-card strong {
+  font-size: 30px;
+}
+
+.submit-button--fit {
+  width: auto;
+  text-decoration: none;
+}
+
+.card-editor-table {
+  display: grid;
+  gap: 10px;
+  margin-top: 16px;
+}
+
+.card-editor-row {
+  display: grid;
+  grid-template-columns: 36px minmax(0, 1fr);
+  gap: 8px;
+  align-items: start;
+}
+
+.card-editor-row--head {
+  display: none;
+}
+
+.card-editor-row textarea {
+  width: 100%;
+  min-height: 88px;
+  border: 1px solid #cfd8e6;
+  border-radius: 6px;
+  padding: 10px 12px;
+  resize: vertical;
+}
+
+.card-editor-index {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 6px;
+  background: #eef4ff;
+  color: #2458d3;
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.editor-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 18px;
+}
+
 .app-shell {
   position: relative;
   min-height: 100vh;
@@ -872,5 +1036,97 @@ a {
   .bottom-nav__icon {
     width: 20px;
     height: 20px;
+  }
+
+  .app-layout {
+    display: grid;
+    grid-template-columns: 240px minmax(0, 1fr);
+  }
+
+  .sidebar {
+    position: sticky;
+    top: 0;
+    display: block;
+    height: 100vh;
+    border-right: 1px solid #dfe5ee;
+    background: #ffffff;
+    padding: 24px 16px;
+  }
+
+  .sidebar__brand {
+    display: inline-flex;
+    color: #111827;
+    font-size: 20px;
+    font-weight: 800;
+    text-decoration: none;
+  }
+
+  .sidebar__nav {
+    display: grid;
+    gap: 6px;
+    margin-top: 32px;
+  }
+
+  .sidebar__link {
+    border-radius: 8px;
+    color: #344054;
+    padding: 11px 12px;
+    font-size: 14px;
+    font-weight: 800;
+    text-decoration: none;
+  }
+
+  .sidebar__link:hover {
+    background: #f5f7fb;
+  }
+
+  .sidebar__link--active {
+    background: #eef4ff;
+    color: #2458d3;
+  }
+
+  .workspace-header {
+    min-height: 72px;
+    padding: 16px 32px;
+  }
+
+  .workspace-header h1 {
+    font-size: 26px;
+  }
+
+  .workspace-main {
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 28px 32px 48px;
+  }
+
+  .workspace-grid {
+    grid-template-columns: minmax(280px, 380px) minmax(0, 1fr);
+    align-items: start;
+    gap: 24px;
+  }
+
+  .dashboard-stats {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .surface-panel {
+    padding: 22px;
+  }
+
+  .card-editor-row {
+    grid-template-columns: 44px minmax(0, 1fr) minmax(0, 1fr) 76px;
+  }
+
+  .card-editor-row--head {
+    display: grid;
+    color: #667085;
+    font-size: 12px;
+    font-weight: 800;
+    text-transform: uppercase;
+  }
+
+  .app-layout .bottom-nav {
+    display: none;
   }
 }

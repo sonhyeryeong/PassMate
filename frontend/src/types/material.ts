@@ -1,3 +1,5 @@
+import type { CreateFlashCardRequest, FlashCard } from '@/types/flashcard';
+
 export interface Material {
   id: number;
   categoryId: number;
@@ -16,7 +18,18 @@ export interface CreateMaterialRequest {
   content?: string;
 }
 
+export interface CreateMaterialWithCardsRequest {
+  title: string;
+  content?: string;
+  cards: CreateFlashCardRequest[];
+}
+
 export interface UpdateMaterialRequest {
   title: string;
   content?: string;
+}
+
+export interface MaterialWithCardsResponse {
+  material: Material;
+  cards: FlashCard[];
 }
