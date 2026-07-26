@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { AppShell } from '@/components/AppShell';
+import { getErrorMessage } from '@/lib/apiClient';
 import { getUser } from '@/lib/userApi';
 import type { User } from '@/types/user';
 
@@ -42,9 +43,9 @@ export default function MyPage() {
         const userData = await getUser(userId);
         setUser(userData);
         setLoadState('success');
-      } catch {
+      } catch (error) {
         setLoadState('error');
-        setMessage('내 정보를 불러오지 못했습니다. 백엔드 서버 상태를 확인해 주세요.');
+        setMessage(getErrorMessage(error, '내 정보를 불러오지 못했습니다.'));
       }
     }
 

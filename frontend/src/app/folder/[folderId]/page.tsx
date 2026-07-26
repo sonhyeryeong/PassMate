@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { useEffect, useMemo, useState } from 'react';
 import { useParams } from 'next/navigation';
 import { AppShell } from '@/components/AppShell';
+import { getErrorMessage } from '@/lib/apiClient';
 import { getFolder, type Folder } from '@/lib/folderApi';
 import { getStudySets, type StudySet } from '@/lib/studySetApi';
 
@@ -50,9 +51,9 @@ export default function FolderDetailPage() {
         setFolder(folderData);
         setStudySets(setItems);
         setLoadState('success');
-      } catch {
+      } catch (error) {
         setLoadState('error');
-        setMessage('폴더 정보를 불러오지 못했습니다. 서버 상태를 확인해 주세요.');
+        setMessage(getErrorMessage(error, '폴더 정보를 불러오지 못했습니다.'));
       }
     }
 

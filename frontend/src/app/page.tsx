@@ -3,24 +3,73 @@
 import Link from 'next/link';
 import { FormEvent, useEffect, useState } from 'react';
 import { AppShell } from '@/components/AppShell';
-import { getFolders } from '@/lib/folderApi';
+import { getErrorMessage } from '@/lib/apiClient';
+import { getDashboard } from '@/lib/dashboardApi';
 import { createUser, getUsers } from '@/lib/userApi';
+import type { Dashboard, LearningQueue } from '@/types/dashboard';
 import type { User } from '@/types/user';
 
 const SELECTED_USER_KEY = 'passmate.selectedUser';
 
 type LoadState = 'loading' | 'success' | 'error';
 type SubmitState = 'idle' | 'submitting';
+type DashboardState = 'idle' | 'loading' | 'success' | 'error';
+
+const LEARNING_QUEUE_PRESENTATIONS: Record<
+  string,
+  {
+    title: string;
+    activeActionLabel: string;
+    activeActionPath: string;
+    emptyActionLabel: string;
+    emptyActionPath: string;
+  }
+> = {
+  FLASH_CARD_REVIEW: {
+    title: '오늘의 카드 복습',
+    activeActionLabel: '카드 복습 시작',
+    activeActionPath: '/review',
+    emptyActionLabel: '학습 세트 보기',
+    emptyActionPath: '/folder',
+  },
+};
+
+function getQueuePresentation(queue: LearningQueue) {
+  return LEARNING_QUEUE_PRESENTATIONS[queue.type] ?? {
+    title: '오늘의 학습',
+    activeActionLabel: '학습 시작',
+    activeActionPath: '/folder',
+    emptyActionLabel: '학습 자료 보기',
+    emptyActionPath: '/folder',
+  };
+}
 
 export default function DashboardPage() {
   const [users, setUsers] = useState<User[]>([]);
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
-  const [folderCount, setFolderCount] = useState(0);
+  const [dashboard, setDashboard] = useState<Dashboard | null>(null);
   const [loadState, setLoadState] = useState<LoadState>('loading');
+  const [dashboardState, setDashboardState] = useState<DashboardState>('idle');
   const [submitState, setSubmitState] = useState<SubmitState>('idle');
   const [nickname, setNickname] = useState('');
   const [email, setEmail] = useState('');
   const [message, setMessage] = useState('');
+  const [dashboardMessage, setDashboardMessage] = useState('');
+
+  async function loadSelectedUserDashboard(userId: number) {
+    setDashboardState('loading');
+    setDashboardMessage('');
+
+    try {
+      const dashboardData = await getDashboard(userId);
+      setDashboard(dashboardData);
+      setDashboardState('success');
+    } catch (error) {
+      setDashboard(null);
+      setDashboardState('error');
+      setDashboardMessage(getErrorMessage(error, '학습 현황을 불러오지 못했습니다. 잠시 후 다시 시도해 주세요.'));
+    }
+  }
 
   useEffect(() => {
     async function loadUsers() {
@@ -36,14 +85,13 @@ export default function DashboardPage() {
 
         if (savedUser) {
           setSelectedUser(savedUser);
-          const folders = await getFolders(savedUser.id);
-          setFolderCount(folders.length);
+          await loadSelectedUserDashboard(savedUser.id);
         }
 
         setLoadState('success');
-      } catch {
+      } catch (error) {
         setLoadState('error');
-        setMessage('프로필 정보를 불러오지 못했습니다. 백엔드 서버 상태를 확인해 주세요.');
+        setMessage(getErrorMessage(error, '프로필 정보를 불러오지 못했습니다.'));
       }
     }
 
@@ -73,11 +121,11 @@ export default function DashboardPage() {
       window.localStorage.setItem(SELECTED_USER_KEY, String(createdUser.id));
       setSelectedUser(createdUser);
       setUsers((currentUsers) => [createdUser, ...currentUsers]);
-      setFolderCount(0);
       setNickname('');
       setEmail('');
-    } catch {
-      setMessage('프로필을 만들지 못했습니다. 이미 사용 중인 이메일일 수 있습니다.');
+      await loadSelectedUserDashboard(createdUser.id);
+    } catch (error) {
+      setMessage(getErrorMessage(error, '프로필을 만들지 못했습니다.'));
     } finally {
       setSubmitState('idle');
     }
@@ -87,19 +135,15 @@ export default function DashboardPage() {
     window.localStorage.setItem(SELECTED_USER_KEY, String(user.id));
     setSelectedUser(user);
     setMessage('');
-
-    try {
-      const folders = await getFolders(user.id);
-      setFolderCount(folders.length);
-    } catch {
-      setFolderCount(0);
-    }
+    await loadSelectedUserDashboard(user.id);
   }
 
   function handleChangeUser() {
     window.localStorage.removeItem(SELECTED_USER_KEY);
     setSelectedUser(null);
-    setFolderCount(0);
+    setDashboard(null);
+    setDashboardState('idle');
+    setDashboardMessage('');
   }
 
   if (!selectedUser) {
@@ -199,42 +243,113 @@ export default function DashboardPage() {
       title="대시보드"
       actions={<button className="secondary-button" onClick={handleChangeUser} type="button">프로필 변경</button>}
     >
-      <section className="dashboard-stats">
-        <article className="stat-card">
-          <span>오늘 복습할 카드</span>
-          <strong>0개</strong>
-        </article>
-        <article className="stat-card">
-          <span>폴더</span>
-          <strong>{folderCount}개</strong>
-        </article>
-        <article className="stat-card">
-          <span>이번 주 복습</span>
-          <strong>0회</strong>
-        </article>
-      </section>
+      {dashboardState === 'loading' && (
+        <div className="status-box" role="status">
+          <h3>오늘의 학습을 준비하는 중</h3>
+          <p>남은 학습과 완료한 활동을 확인하고 있습니다.</p>
+        </div>
+      )}
 
-      <section className="workspace-grid">
-        <article className="surface-panel">
-          <h2>학습 세트 만들기</h2>
-          <p>폴더를 만들고, 그 안에서 앞면/뒷면 카드를 여러 개 입력해 학습 세트를 구성하세요.</p>
+      {dashboardState === 'error' && (
+        <div className="status-box error-box" role="alert">
+          <h3>학습 현황을 불러오지 못했습니다</h3>
+          <p>{dashboardMessage}</p>
           <div className="status-actions">
-            <Link className="submit-button submit-button--fit" href="/folder">
-              폴더로 이동
-            </Link>
+            <button
+              className="secondary-button"
+              onClick={() => void loadSelectedUserDashboard(selectedUser.id)}
+              type="button"
+            >
+              다시 시도
+            </button>
           </div>
-        </article>
+        </div>
+      )}
 
-        <article className="surface-panel">
-          <h2>오늘의 복습</h2>
-          <p>만든 카드가 있으면 복습 화면에서 한 장씩 확인하고 결과를 남길 수 있습니다.</p>
-          <div className="status-actions">
-            <Link className="secondary-button" href="/review">
-              복습 시작
-            </Link>
-          </div>
-        </article>
-      </section>
+      {dashboardState === 'success' && dashboard && (
+        <div className="stack-layout">
+          <section className="dashboard-stats" aria-label="오늘의 학습 요약">
+            <article className="stat-card">
+              <span>오늘 남은 학습</span>
+              <strong>{dashboard.summary.pendingLearningCount}개</strong>
+            </article>
+            <article className="stat-card">
+              <span>오늘 완료</span>
+              <strong>{dashboard.summary.completedTodayCount}개</strong>
+            </article>
+            <article className="stat-card">
+              <span>폴더</span>
+              <strong>{dashboard.summary.folderCount}개</strong>
+            </article>
+          </section>
+
+          <section aria-labelledby="learning-queue-title">
+            <div className="section-heading">
+              <div>
+                <h2 id="learning-queue-title">오늘의 학습</h2>
+                <p>지금 해야 할 학습을 확인하고 바로 시작하세요.</p>
+              </div>
+            </div>
+
+            {dashboard.learningQueues.length === 0 && (
+              <div className="empty-state">
+                <h3>오늘 예정된 학습이 없습니다</h3>
+                <p>새 학습 세트를 만들거나 기존 학습 자료를 확인해 보세요.</p>
+                <div className="status-actions">
+                  <Link className="submit-button submit-button--fit" href="/folder">
+                    폴더 보기
+                  </Link>
+                </div>
+              </div>
+            )}
+
+            {dashboard.learningQueues.length > 0 && (
+              <div className="learning-queue-list">
+                {dashboard.learningQueues.map((queue) => {
+                  const presentation = getQueuePresentation(queue);
+                  const hasPendingLearning = queue.pendingCount > 0;
+
+                  return (
+                    <article className="surface-panel learning-queue-card" key={queue.type}>
+                      <div>
+                        <p className="eyebrow">학습 활동</p>
+                        <h3>{presentation.title}</h3>
+                        <p>
+                          {hasPendingLearning
+                            ? `오늘 진행할 학습이 ${queue.pendingCount}개 남았습니다.`
+                            : '오늘 예정된 학습을 모두 마쳤습니다.'}
+                        </p>
+                      </div>
+                      <dl className="learning-queue-card__counts">
+                        <div>
+                          <dt>남은 학습</dt>
+                          <dd>{queue.pendingCount}개</dd>
+                        </div>
+                        <div>
+                          <dt>오늘 완료</dt>
+                          <dd>{queue.completedTodayCount}개</dd>
+                        </div>
+                      </dl>
+                      <Link
+                        className={hasPendingLearning ? 'submit-button submit-button--fit' : 'secondary-button'}
+                        href={
+                          hasPendingLearning
+                            ? presentation.activeActionPath
+                            : presentation.emptyActionPath
+                        }
+                      >
+                        {hasPendingLearning
+                          ? presentation.activeActionLabel
+                          : presentation.emptyActionLabel}
+                      </Link>
+                    </article>
+                  );
+                })}
+              </div>
+            )}
+          </section>
+        </div>
+      )}
     </AppShell>
   );
 }

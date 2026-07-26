@@ -3,6 +3,7 @@ package com.passmate.domain.flashcard.service;
 import com.passmate.domain.flashcard.dto.FlashCardDto;
 import com.passmate.domain.flashcard.entity.FlashCard;
 import com.passmate.domain.flashcard.exception.CardValidationException;
+import com.passmate.domain.error.ResourceNotFoundException;
 import com.passmate.domain.flashcard.repository.FlashCardRepository;
 import com.passmate.domain.review.repository.ReviewHistoryRepository;
 import lombok.RequiredArgsConstructor;
@@ -21,7 +22,7 @@ public class FlashCardService {
 
     public FlashCardDto.Response getFlashCard(Long flashCardId, Long materialId) {
         FlashCard flashCard = flashCardRepository.findByIdAndMaterialId(flashCardId, materialId)
-                .orElseThrow(() -> new IllegalArgumentException("FlashCard not found"));
+                .orElseThrow(() -> cardNotFound());
         return toResponse(flashCard);
     }
 
@@ -52,7 +53,7 @@ public class FlashCardService {
     public FlashCardDto.Response updateFlashCard(Long flashCardId, Long materialId, FlashCardDto.UpdateRequest request) {
         validateCard(request != null ? request.getFront() : null, request != null ? request.getBack() : null);
         FlashCard flashCard = flashCardRepository.findByIdAndMaterialId(flashCardId, materialId)
-                .orElseThrow(() -> new IllegalArgumentException("FlashCard not found"));
+                .orElseThrow(() -> cardNotFound());
 
         flashCard.update(request.getFront().trim(), request.getBack().trim());
         FlashCard updatedFlashCard = flashCardRepository.save(flashCard);
@@ -62,7 +63,7 @@ public class FlashCardService {
     @Transactional
     public void deleteFlashCard(Long flashCardId, Long materialId) {
         FlashCard flashCard = flashCardRepository.findByIdAndMaterialId(flashCardId, materialId)
-                .orElseThrow(() -> new IllegalArgumentException("FlashCard not found"));
+                .orElseThrow(() -> cardNotFound());
         reviewHistoryRepository.deleteByFlashCardId(flashCardId);
         flashCardRepository.delete(flashCard);
     }
@@ -80,6 +81,10 @@ public class FlashCardService {
         if (back.trim().length() > 600) {
             throw new CardValidationException("카드 뒷면은 600자 이하로 입력해 주세요.");
         }
+    }
+
+    private ResourceNotFoundException cardNotFound() {
+        return new ResourceNotFoundException("FLASH_CARD_NOT_FOUND", "카드를 찾을 수 없습니다.");
     }
 
     private FlashCardDto.Response toResponse(FlashCard flashCard) {

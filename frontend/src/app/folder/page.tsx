@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { FormEvent, useEffect, useState } from 'react';
 import { AppShell } from '@/components/AppShell';
+import { getErrorMessage } from '@/lib/apiClient';
 import { createFolder, getFolders, type Folder } from '@/lib/folderApi';
 
 const SELECTED_USER_KEY = 'passmate.selectedUser';
@@ -53,9 +54,9 @@ export default function FolderListPage() {
         const items = await getFolders(nextUserId);
         setFolders(items);
         setLoadState('success');
-      } catch {
+      } catch (error) {
         setLoadState('error');
-        setMessage('폴더 목록을 불러오지 못했습니다. 백엔드 서버 상태를 확인해 주세요.');
+        setMessage(getErrorMessage(error, '폴더 목록을 불러오지 못했습니다.'));
       }
     }
 
@@ -93,8 +94,8 @@ export default function FolderListPage() {
       setDescription('');
       setLoadState('success');
       setMessage('새 폴더를 만들었습니다.');
-    } catch {
-      setMessage('폴더를 만들지 못했습니다. 입력값과 서버 상태를 확인해 주세요.');
+    } catch (error) {
+      setMessage(getErrorMessage(error, '폴더를 만들지 못했습니다.'));
     } finally {
       setSubmitState('idle');
     }

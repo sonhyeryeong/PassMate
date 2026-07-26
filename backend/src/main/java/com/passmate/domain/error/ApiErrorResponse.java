@@ -1,4 +1,4 @@
-package com.passmate.domain.flashcard.exception;
+package com.passmate.domain.error;
 
 public record ApiErrorResponse(
         String code,

@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { FormEvent, useMemo, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { AppShell } from '@/components/AppShell';
+import { getErrorMessage } from '@/lib/apiClient';
 import { createStudySet, type StudySetCardInput } from '@/lib/studySetApi';
 
 type SubmitState = 'idle' | 'submitting';
@@ -84,8 +85,8 @@ export default function NewStudySetPage() {
       });
 
       router.push(`/folder/${folderId}/set/${studySet.id}`);
-    } catch {
-      setMessage('학습 세트를 저장하지 못했습니다. 입력값과 서버 상태를 확인해 주세요.');
+    } catch (error) {
+      setMessage(getErrorMessage(error, '학습 세트를 저장하지 못했습니다.'));
     } finally {
       setSubmitState('idle');
     }

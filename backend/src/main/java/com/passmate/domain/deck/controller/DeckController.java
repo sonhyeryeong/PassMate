@@ -16,33 +16,24 @@ public class DeckController {
 
     @GetMapping
     public ResponseEntity<DeckDto.ListResponse> getUserDecks(
-            @RequestParam(required = false) Long userId) {
+            @RequestParam Long userId) {
         // TODO: 인증 시스템 구현 후 userId는 현재 사용자로 대체
-        if (userId == null) {
-            throw new IllegalArgumentException("userId is required");
-        }
         return ResponseEntity.ok(deckService.getUserDecks(userId));
     }
 
     @GetMapping("/{deckId}")
     public ResponseEntity<DeckDto.Response> getDeck(
             @PathVariable Long deckId,
-            @RequestParam(required = false) Long userId) {
+            @RequestParam Long userId) {
         // TODO: 인증 시스템 구현 후 userId는 현재 사용자로 대체
-        if (userId == null) {
-            throw new IllegalArgumentException("userId is required");
-        }
         return ResponseEntity.ok(deckService.getDeck(deckId, userId));
     }
 
     @PostMapping
     public ResponseEntity<DeckDto.Response> createDeck(
-            @RequestParam(required = false) Long userId,
+            @RequestParam Long userId,
             @RequestBody DeckDto.CreateRequest request) {
         // TODO: 인증 시스템 구현 후 userId는 현재 사용자로 대체
-        if (userId == null) {
-            throw new IllegalArgumentException("userId is required");
-        }
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(deckService.createDeck(userId, request));
     }
@@ -50,23 +41,17 @@ public class DeckController {
     @PatchMapping("/{deckId}")
     public ResponseEntity<DeckDto.Response> updateDeck(
             @PathVariable Long deckId,
-            @RequestParam(required = false) Long userId,
+            @RequestParam Long userId,
             @RequestBody DeckDto.UpdateRequest request) {
         // TODO: 인증 시스템 구현 후 userId는 현재 사용자로 대체
-        if (userId == null) {
-            throw new IllegalArgumentException("userId is required");
-        }
         return ResponseEntity.ok(deckService.updateDeck(deckId, userId, request));
     }
 
     @DeleteMapping("/{deckId}")
     public ResponseEntity<Void> deleteDeck(
             @PathVariable Long deckId,
-            @RequestParam(required = false) Long userId) {
+            @RequestParam Long userId) {
         // TODO: 인증 시스템 구현 후 userId는 현재 사용자로 대체
-        if (userId == null) {
-            throw new IllegalArgumentException("userId is required");
-        }
         deckService.deleteDeck(deckId, userId);
         return ResponseEntity.noContent().build();
     }

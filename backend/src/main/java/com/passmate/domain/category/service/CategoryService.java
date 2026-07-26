@@ -3,6 +3,8 @@ package com.passmate.domain.category.service;
 import com.passmate.domain.category.dto.CategoryDto;
 import com.passmate.domain.category.entity.Category;
 import com.passmate.domain.category.repository.CategoryRepository;
+import com.passmate.domain.error.ResourceNotFoundException;
+import com.passmate.domain.error.InvalidRequestException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -18,7 +20,7 @@ public class CategoryService {
 
     public CategoryDto.Response getCategory(Long categoryId, Long deckId) {
         Category category = categoryRepository.findByIdAndDeckId(categoryId, deckId)
-                .orElseThrow(() -> new IllegalArgumentException("Category not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("CATEGORY_NOT_FOUND", "기본 섹션을 찾을 수 없습니다."));
         return toResponse(category);
     }
 
@@ -34,6 +36,7 @@ public class CategoryService {
 
     @Transactional
     public CategoryDto.Response createCategory(Long deckId, CategoryDto.CreateRequest request) {
+        validateName(request != null ? request.getName() : null);
         Category category = Category.builder()
                 .deckId(deckId)
                 .name(request.getName())
@@ -46,8 +49,9 @@ public class CategoryService {
 
     @Transactional
     public CategoryDto.Response updateCategory(Long categoryId, Long deckId, CategoryDto.UpdateRequest request) {
+        validateName(request != null ? request.getName() : null);
         Category category = categoryRepository.findByIdAndDeckId(categoryId, deckId)
-                .orElseThrow(() -> new IllegalArgumentException("Category not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("CATEGORY_NOT_FOUND", "기본 섹션을 찾을 수 없습니다."));
 
         category.update(request.getName(), request.getSortOrder());
         Category updatedCategory = categoryRepository.save(category);
@@ -57,7 +61,7 @@ public class CategoryService {
     @Transactional
     public void deleteCategory(Long categoryId, Long deckId) {
         Category category = categoryRepository.findByIdAndDeckId(categoryId, deckId)
-                .orElseThrow(() -> new IllegalArgumentException("Category not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("CATEGORY_NOT_FOUND", "기본 섹션을 찾을 수 없습니다."));
         categoryRepository.delete(category);
     }
 
@@ -70,5 +74,11 @@ public class CategoryService {
                 .createdAt(category.getCreatedAt())
                 .updatedAt(category.getUpdatedAt())
                 .build();
+    }
+
+    private void validateName(String name) {
+        if (name == null || name.isBlank()) {
+            throw new InvalidRequestException("CATEGORY_VALIDATION_ERROR", "기본 섹션 이름을 입력해 주세요.");
+        }
     }
 }

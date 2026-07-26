@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { useEffect, useMemo, useState } from 'react';
 import { AppShell } from '@/components/AppShell';
+import { getErrorMessage } from '@/lib/apiClient';
 import { createReview, getTodayReviewCards } from '@/lib/reviewApi';
 import type { FlashCard } from '@/types/flashcard';
 import type { ReviewResult } from '@/types/review';
@@ -66,9 +67,9 @@ export default function ReviewPage() {
         setIsAnswerVisible(false);
         setIsComplete(false);
         setLoadState('success');
-      } catch {
+      } catch (error) {
         setLoadState('error');
-        setMessage('오늘 복습할 카드를 불러오지 못했습니다. 백엔드 서버 상태를 확인해 주세요.');
+        setMessage(getErrorMessage(error, '오늘 복습할 카드를 불러오지 못했습니다.'));
       }
     }
 
@@ -94,8 +95,8 @@ export default function ReviewPage() {
 
       setCurrentIndex((nextIndex) => nextIndex + 1);
       setIsAnswerVisible(false);
-    } catch {
-      setMessage('복습 결과를 저장하지 못했습니다. 잠시 후 다시 시도해 주세요.');
+    } catch (error) {
+      setMessage(getErrorMessage(error, '복습 결과를 저장하지 못했습니다.'));
     } finally {
       setSubmitState('idle');
     }

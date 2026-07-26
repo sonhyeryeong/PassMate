@@ -1,6 +1,7 @@
 'use client';
 
 import { FormEvent, useState } from 'react';
+import { getErrorMessage } from '@/lib/apiClient';
 import type { FlashCard } from '@/types/flashcard';
 
 interface FlashCardEditorPanelProps {
@@ -35,8 +36,8 @@ export function FlashCardEditorPanel({
 
     try {
       await onSave(trimmedFront, trimmedBack);
-    } catch {
-      setMessage('카드를 저장하지 못했습니다. 잠시 후 다시 시도해 주세요.');
+    } catch (error) {
+      setMessage(getErrorMessage(error, '카드를 저장하지 못했습니다. 잠시 후 다시 시도해 주세요.'));
     } finally {
       setIsSaving(false);
     }

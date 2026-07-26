@@ -13,6 +13,11 @@ public interface ReviewHistoryRepository extends JpaRepository<ReviewHistory, Lo
     List<ReviewHistory> findByFlashCardId(Long flashCardId);
     void deleteByFlashCardId(Long flashCardId);
     List<ReviewHistory> findByUserIdOrderByReviewedAtDesc(Long userId);
+    long countByUserIdAndReviewedAtGreaterThanEqualAndReviewedAtLessThan(
+            Long userId,
+            LocalDateTime startAt,
+            LocalDateTime endAt
+    );
     
     @Query("""
             SELECT r

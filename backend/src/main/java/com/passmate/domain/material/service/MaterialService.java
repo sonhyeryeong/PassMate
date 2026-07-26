@@ -1,5 +1,7 @@
 package com.passmate.domain.material.service;
 
+import com.passmate.domain.error.InvalidRequestException;
+import com.passmate.domain.error.ResourceNotFoundException;
 import com.passmate.domain.material.dto.MaterialDto;
 import com.passmate.domain.material.entity.Material;
 import com.passmate.domain.material.repository.MaterialRepository;
@@ -23,7 +25,10 @@ public class MaterialService {
 
     public MaterialDto.Response getMaterial(Long materialId, Long categoryId) {
         Material material = materialRepository.findByIdAndCategoryId(materialId, categoryId)
-                .orElseThrow(() -> new IllegalArgumentException("Material not found"));
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "MATERIAL_NOT_FOUND",
+                        "학습 세트를 찾을 수 없습니다."
+                ));
         return toResponse(material);
     }
 
@@ -39,6 +44,8 @@ public class MaterialService {
 
     @Transactional
     public MaterialDto.Response createMaterial(Long categoryId, MaterialDto.CreateRequest request) {
+        validateMaterialRequest(request);
+
         Material material = Material.builder()
                 .categoryId(categoryId)
                 .title(request.getTitle())
@@ -81,8 +88,13 @@ public class MaterialService {
 
     @Transactional
     public MaterialDto.Response updateMaterial(Long materialId, Long categoryId, MaterialDto.UpdateRequest request) {
+        validateMaterialRequest(request);
+
         Material material = materialRepository.findByIdAndCategoryId(materialId, categoryId)
-                .orElseThrow(() -> new IllegalArgumentException("Material not found"));
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "MATERIAL_NOT_FOUND",
+                        "학습 세트를 찾을 수 없습니다."
+                ));
 
         material.update(request.getTitle(), request.getContent());
         Material updatedMaterial = materialRepository.save(material);
@@ -92,7 +104,10 @@ public class MaterialService {
     @Transactional
     public void deleteMaterial(Long materialId, Long categoryId) {
         Material material = materialRepository.findByIdAndCategoryId(materialId, categoryId)
-                .orElseThrow(() -> new IllegalArgumentException("Material not found"));
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "MATERIAL_NOT_FOUND",
+                        "학습 세트를 찾을 수 없습니다."
+                ));
         flashCardRepository.deleteByMaterialId(materialId);
         materialRepository.delete(material);
     }
@@ -110,18 +125,27 @@ public class MaterialService {
 
     private void validateCreateWithCardsRequest(MaterialDto.CreateWithCardsRequest request) {
         if (request == null) {
-            throw new IllegalArgumentException("request is required");
+            throw new InvalidRequestException(
+                    "MATERIAL_VALIDATION_ERROR",
+                    "학습 세트 정보를 입력해 주세요."
+            );
         }
 
         if (request.getTitle() == null || request.getTitle().isBlank()) {
-            throw new IllegalArgumentException("title is required");
+            throw new InvalidRequestException(
+                    "MATERIAL_VALIDATION_ERROR",
+                    "학습 세트 제목을 입력해 주세요."
+            );
         }
 
         List<FlashCardDto.CreateRequest> cards = request.getCards() != null
                 ? request.getCards()
                 : Collections.emptyList();
         if (cards.isEmpty()) {
-            throw new IllegalArgumentException("cards are required");
+            throw new InvalidRequestException(
+                    "MATERIAL_VALIDATION_ERROR",
+                    "카드를 한 장 이상 입력해 주세요."
+            );
         }
 
         boolean hasInvalidCard = cards.stream()
@@ -130,7 +154,28 @@ public class MaterialService {
                         || card.getBack() == null
                         || card.getBack().isBlank());
         if (hasInvalidCard) {
-            throw new IllegalArgumentException("card front and back are required");
+            throw new InvalidRequestException(
+                    "MATERIAL_VALIDATION_ERROR",
+                    "모든 카드의 앞면과 뒷면을 입력해 주세요."
+            );
+        }
+    }
+
+    private void validateMaterialRequest(MaterialDto.CreateRequest request) {
+        if (request == null || request.getTitle() == null || request.getTitle().isBlank()) {
+            throw new InvalidRequestException(
+                    "MATERIAL_VALIDATION_ERROR",
+                    "학습 세트 제목을 입력해 주세요."
+            );
+        }
+    }
+
+    private void validateMaterialRequest(MaterialDto.UpdateRequest request) {
+        if (request == null || request.getTitle() == null || request.getTitle().isBlank()) {
+            throw new InvalidRequestException(
+                    "MATERIAL_VALIDATION_ERROR",
+                    "학습 세트 제목을 입력해 주세요."
+            );
         }
     }
 

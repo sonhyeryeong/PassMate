@@ -5,6 +5,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { useParams } from 'next/navigation';
 import { AppShell } from '@/components/AppShell';
 import { FlashCardEditorPanel } from '@/components/FlashCardEditorPanel';
+import { getErrorMessage } from '@/lib/apiClient';
 import { createFlashCard, deleteFlashCard, updateFlashCard } from '@/lib/flashcardApi';
 import { getFolder, type Folder } from '@/lib/folderApi';
 import { getStudySetInFolder, type StudySet } from '@/lib/studySetApi';
@@ -66,9 +67,9 @@ export default function StudySetDetailPage() {
         setStudySet(detail.studySet);
         setCards(detail.cards);
         setLoadState('success');
-      } catch {
+      } catch (error) {
         setLoadState('error');
-        setMessage('학습 세트를 불러오지 못했습니다. 서버 상태를 확인해 주세요.');
+        setMessage(getErrorMessage(error, '학습 세트를 불러오지 못했습니다.'));
       }
     }
 
@@ -130,12 +131,14 @@ export default function StudySetDetailPage() {
     setMessage('');
 
     const deletedCardIds: number[] = [];
+    let deleteError: unknown;
 
     for (const cardId of selectedCardIds) {
       try {
         await deleteFlashCard(setId, cardId);
         deletedCardIds.push(cardId);
-      } catch {
+      } catch (error) {
+        deleteError = error;
         break;
       }
     }
@@ -156,8 +159,8 @@ export default function StudySetDetailPage() {
 
     setMessage(
       deletedCardIds.length > 0
-        ? `${deletedCardIds.length}장은 삭제했지만 일부 카드를 삭제하지 못했습니다.`
-        : '카드를 삭제하지 못했습니다. 잠시 후 다시 시도해 주세요.',
+        ? `${deletedCardIds.length}장은 삭제했지만 일부 카드를 삭제하지 못했습니다. ${getErrorMessage(deleteError, '')}`.trim()
+        : getErrorMessage(deleteError, '카드를 삭제하지 못했습니다. 잠시 후 다시 시도해 주세요.'),
     );
   }
 

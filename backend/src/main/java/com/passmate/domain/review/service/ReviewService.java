@@ -3,6 +3,8 @@ package com.passmate.domain.review.service;
 import com.passmate.domain.flashcard.dto.FlashCardDto;
 import com.passmate.domain.flashcard.entity.FlashCard;
 import com.passmate.domain.flashcard.repository.FlashCardRepository;
+import com.passmate.domain.error.InvalidRequestException;
+import com.passmate.domain.error.ResourceNotFoundException;
 import com.passmate.domain.review.dto.ReviewDto;
 import com.passmate.domain.review.entity.ReviewHistory;
 import com.passmate.domain.review.entity.ReviewResult;
@@ -24,7 +26,10 @@ public class ReviewService {
 
     public ReviewDto.Response getReview(Long reviewId) {
         ReviewHistory review = reviewHistoryRepository.findById(reviewId)
-                .orElseThrow(() -> new IllegalArgumentException("Review not found"));
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "REVIEW_NOT_FOUND",
+                        "복습 기록을 찾을 수 없습니다."
+                ));
         return toResponse(review);
     }
 
@@ -74,12 +79,15 @@ public class ReviewService {
 
     @Transactional
     public ReviewDto.Response createReview(Long userId, Long flashCardId, ReviewDto.CreateRequest request) {
-        if (request.getResult() == null) {
-            throw new IllegalArgumentException("result is required");
+        if (request == null || request.getResult() == null) {
+            throw new InvalidRequestException("REVIEW_RESULT_REQUIRED", "복습 결과를 선택해 주세요.");
         }
 
         FlashCard flashCard = flashCardRepository.findUserFlashCard(userId, flashCardId)
-                .orElseThrow(() -> new IllegalArgumentException("FlashCard not found"));
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "FLASH_CARD_NOT_FOUND",
+                        "복습할 카드를 찾을 수 없습니다."
+                ));
         LocalDateTime reviewedAt = request.getReviewedAt() != null ? request.getReviewedAt() : LocalDateTime.now();
 
         ReviewHistory review = ReviewHistory.builder()

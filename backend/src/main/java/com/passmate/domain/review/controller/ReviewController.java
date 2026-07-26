@@ -49,12 +49,9 @@ public class ReviewController {
     @PostMapping("/cards/{cardId}")
     public ResponseEntity<ReviewDto.Response> createReview(
             @PathVariable Long cardId,
-            @RequestParam(required = false) Long userId,
+            @RequestParam Long userId,
             @RequestBody ReviewDto.CreateRequest request) {
         // TODO: 인증 시스템 구현 후 userId는 현재 사용자로 대체
-        if (userId == null) {
-            throw new IllegalArgumentException("userId is required");
-        }
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(reviewService.createReview(userId, cardId, request));
     }

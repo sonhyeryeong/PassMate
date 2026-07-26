@@ -129,6 +129,51 @@ a {
   gap: 12px;
 }
 
+.learning-queue-list {
+  display: grid;
+  gap: 12px;
+  margin-top: 16px;
+}
+
+.learning-queue-card {
+  display: grid;
+  gap: 18px;
+}
+
+.learning-queue-card h3 {
+  margin: 4px 0 8px;
+  color: #111827;
+  font-size: 18px;
+}
+
+.learning-queue-card p {
+  margin-bottom: 0;
+}
+
+.learning-queue-card__counts {
+  display: flex;
+  gap: 20px;
+  margin: 0;
+}
+
+.learning-queue-card__counts div {
+  display: grid;
+  gap: 4px;
+  min-width: 72px;
+}
+
+.learning-queue-card__counts dt {
+  color: #667085;
+  font-size: 12px;
+}
+
+.learning-queue-card__counts dd {
+  margin: 0;
+  color: #111827;
+  font-size: 16px;
+  font-weight: 800;
+}
+
 .stat-card {
   display: grid;
   gap: 8px;
@@ -1255,6 +1300,12 @@ a {
 
   .dashboard-stats {
     grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .learning-queue-card {
+    grid-template-columns: minmax(0, 1fr) auto auto;
+    align-items: center;
+    gap: 24px;
   }
 
   .surface-panel {

@@ -3,6 +3,8 @@ package com.passmate.domain.deck.service;
 import com.passmate.domain.deck.dto.DeckDto;
 import com.passmate.domain.deck.entity.Deck;
 import com.passmate.domain.deck.repository.DeckRepository;
+import com.passmate.domain.error.ResourceNotFoundException;
+import com.passmate.domain.error.InvalidRequestException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -18,7 +20,7 @@ public class DeckService {
 
     public DeckDto.Response getDeck(Long deckId, Long userId) {
         Deck deck = deckRepository.findByIdAndUserId(deckId, userId)
-                .orElseThrow(() -> new IllegalArgumentException("Deck not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("DECK_NOT_FOUND", "폴더를 찾을 수 없습니다."));
         return toResponse(deck);
     }
 
@@ -34,6 +36,7 @@ public class DeckService {
 
     @Transactional
     public DeckDto.Response createDeck(Long userId, DeckDto.CreateRequest request) {
+        validateName(request != null ? request.getName() : null);
         Deck deck = Deck.builder()
                 .userId(userId)
                 .name(request.getName())
@@ -46,8 +49,9 @@ public class DeckService {
 
     @Transactional
     public DeckDto.Response updateDeck(Long deckId, Long userId, DeckDto.UpdateRequest request) {
+        validateName(request != null ? request.getName() : null);
         Deck deck = deckRepository.findByIdAndUserId(deckId, userId)
-                .orElseThrow(() -> new IllegalArgumentException("Deck not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("DECK_NOT_FOUND", "폴더를 찾을 수 없습니다."));
 
         deck.update(request.getName(), request.getDescription());
         Deck updatedDeck = deckRepository.save(deck);
@@ -57,7 +61,7 @@ public class DeckService {
     @Transactional
     public void deleteDeck(Long deckId, Long userId) {
         Deck deck = deckRepository.findByIdAndUserId(deckId, userId)
-                .orElseThrow(() -> new IllegalArgumentException("Deck not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("DECK_NOT_FOUND", "폴더를 찾을 수 없습니다."));
         deckRepository.delete(deck);
     }
 
@@ -70,5 +74,11 @@ public class DeckService {
                 .createdAt(deck.getCreatedAt())
                 .updatedAt(deck.getUpdatedAt())
                 .build();
+    }
+
+    private void validateName(String name) {
+        if (name == null || name.isBlank()) {
+            throw new InvalidRequestException("DECK_VALIDATION_ERROR", "폴더 이름을 입력해 주세요.");
+        }
     }
 }
