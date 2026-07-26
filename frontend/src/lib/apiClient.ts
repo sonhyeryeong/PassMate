@@ -6,26 +6,33 @@ interface ApiErrorResponse {
 }
 
 export class ApiError extends Error {
+  public readonly status: number;
+  public readonly code: string;
+
   constructor(
-    public readonly status: number,
-    public readonly code: string,
+    status: number,
+    code: string,
     message: string,
   ) {
     super(message);
     this.name = 'ApiError';
+    this.status = status;
+    this.code = code;
   }
 }
 
 export async function request<T>(path: string, init?: RequestInit): Promise<T> {
   let response: Response;
+  const headers = new Headers(init?.headers);
+
+  if (!headers.has('Content-Type') && typeof init?.body === 'string') {
+    headers.set('Content-Type', 'application/json');
+  }
 
   try {
     response = await fetch(`${API_BASE_URL}${path}`, {
       ...init,
-      headers: {
-        'Content-Type': 'application/json',
-        ...init?.headers,
-      },
+      headers,
     });
   } catch {
     throw new ApiError(
@@ -39,8 +46,8 @@ export async function request<T>(path: string, init?: RequestInit): Promise<T> {
     const errorResponse = await readErrorResponse(response);
     throw new ApiError(
       response.status,
-      errorResponse?.code ?? `HTTP_${response.status}`,
-      errorResponse?.message ?? getFallbackMessage(response.status),
+      getNonEmptyString(errorResponse?.code) ?? `HTTP_${response.status}`,
+      getNonEmptyString(errorResponse?.message) ?? getFallbackMessage(response.status),
     );
   }
 
@@ -82,4 +89,8 @@ function getFallbackMessage(status: number): string {
     return '서버에서 오류가 발생했습니다. 잠시 후 다시 시도해 주세요.';
   }
   return '요청을 처리하지 못했습니다. 입력값을 확인해 주세요.';
+}
+
+function getNonEmptyString(value: unknown): string | null {
+  return typeof value === 'string' && value.trim() ? value : null;
 }
