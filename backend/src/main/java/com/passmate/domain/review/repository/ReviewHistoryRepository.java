@@ -11,6 +11,7 @@ import java.util.List;
 @Repository
 public interface ReviewHistoryRepository extends JpaRepository<ReviewHistory, Long> {
     List<ReviewHistory> findByFlashCardId(Long flashCardId);
+    void deleteByFlashCardId(Long flashCardId);
     List<ReviewHistory> findByUserIdOrderByReviewedAtDesc(Long userId);
     
     @Query("""

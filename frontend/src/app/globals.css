@@ -424,6 +424,13 @@ a {
   gap: 12px;
 }
 
+.page-actions,
+.section-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
 .compact-heading {
   margin-bottom: 12px;
 }
@@ -570,64 +577,209 @@ a {
   white-space: pre-wrap;
 }
 
-.flashcard-list {
+.flashcard-selection {
   display: grid;
   gap: 10px;
 }
 
-.flashcard-card {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
+.flashcard-selection__toolbar {
+  display: flex;
+  align-items: center;
   gap: 12px;
+  min-height: 44px;
+  border: 1px solid #dfe5ee;
+  border-radius: 8px;
+  background: #f8fafc;
+  padding: 8px 10px;
+  color: #667085;
+  font-size: 13px;
+}
+
+.flashcard-select-all {
+  display: inline-flex;
+  align-items: center;
+  cursor: pointer;
+  gap: 7px;
+  color: #344054;
+  font-weight: 700;
+}
+
+.flashcard-select-all input,
+.flashcard-table input {
+  width: 17px;
+  height: 17px;
+  accent-color: #315efb;
+}
+
+.flashcard-selection__actions {
+  display: flex;
+  gap: 8px;
+  margin-left: auto;
+}
+
+.flashcard-table-wrap {
+  overflow-x: auto;
   border: 1px solid #dfe5ee;
   border-radius: 8px;
   background: #ffffff;
-  padding: 14px;
   box-shadow: 0 6px 20px rgba(34, 51, 84, 0.06);
 }
 
-.flashcard-card strong {
-  display: block;
-  color: #111827;
-  font-size: 14px;
-  line-height: 1.45;
+.flashcard-table {
+  width: 100%;
+  min-width: 720px;
+  border-collapse: collapse;
+  table-layout: fixed;
 }
 
-.flashcard-card p {
-  margin: 8px 0 0;
-  color: #667085;
+.flashcard-table__check-column,
+.flashcard-table__number-column {
+  width: 64px;
+}
+
+.flashcard-table__front-column {
+  width: 38%;
+}
+
+.flashcard-table__back-column {
+  width: auto;
+}
+
+.flashcard-table th,
+.flashcard-table td {
+  border-bottom: 1px solid #e7ebf1;
+  padding: 12px 14px;
+  text-align: left;
+  vertical-align: top;
+}
+
+.flashcard-table th {
+  background: #f8fafc;
+  color: #475467;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.flashcard-table td {
+  color: #344054;
   font-size: 13px;
   line-height: 1.5;
-  white-space: pre-wrap;
 }
 
-.flashcard-card small {
+.flashcard-table__content {
+  display: -webkit-box;
+  overflow: hidden;
+  overflow-wrap: anywhere;
+  white-space: pre-wrap;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+.flashcard-table tbody tr:last-child td {
+  border-bottom: 0;
+}
+
+.flashcard-table tbody tr:hover td {
+  background: #f9fbff;
+}
+
+.flashcard-table__row--selected td {
+  background: #f0f4ff;
+}
+
+.flashcard-table__row--selected:hover td {
+  background: #e9efff;
+}
+
+.flashcard-table .flashcard-table__check {
+  width: 64px;
+  text-align: center;
+  vertical-align: middle;
+}
+
+.flashcard-table__number {
+  width: 64px;
+  color: #667085;
+}
+
+.card-feedback {
+  margin-top: 12px;
+}
+
+.editor-overlay,
+.dialog-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: flex;
+  justify-content: flex-end;
+  background: rgba(15, 23, 42, 0.48);
+}
+
+.card-editor-panel {
+  width: min(100%, 460px);
+  height: 100%;
+  overflow-y: auto;
+  background: #ffffff;
+  padding: 24px;
+  box-shadow: -16px 0 40px rgba(15, 23, 42, 0.18);
+}
+
+.card-editor-panel__header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.card-editor-panel__header h2,
+.confirm-dialog h2 {
+  margin: 4px 0 0;
+  color: #111827;
+}
+
+.card-editor-panel__form {
+  display: grid;
+  gap: 18px;
+  margin-top: 28px;
+}
+
+.card-editor-panel__form textarea {
+  min-height: 140px;
+}
+
+.form-help {
+  align-self: flex-end;
   color: #8a96a8;
   font-size: 12px;
-  white-space: nowrap;
 }
 
-.flashcard-side {
-  display: grid;
-  align-content: start;
-  justify-items: end;
-  gap: 8px;
+.dialog-overlay {
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
 }
 
-.flashcard-side .secondary-button {
-  min-width: 58px;
+.confirm-dialog {
+  width: min(100%, 420px);
+  border-radius: 10px;
+  background: #ffffff;
+  padding: 24px;
+  box-shadow: 0 24px 60px rgba(15, 23, 42, 0.24);
 }
 
-.flashcard-edit-form {
-  display: grid;
-  grid-column: 1 / -1;
-  gap: 12px;
+.confirm-dialog p {
+  margin: 12px 0 24px;
+  color: #667085;
+  line-height: 1.5;
 }
 
-.flashcard-actions {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 8px;
+.delete-button {
+  background: #dc2626;
+}
+
+.delete-button:hover {
+  background: #b91c1c;
 }
 
 .review-panel {
@@ -971,11 +1123,6 @@ a {
   .list-card {
     min-height: 92px;
     padding: 16px;
-  }
-
-  .flashcard-list {
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-    gap: 12px;
   }
 
   .review-card {

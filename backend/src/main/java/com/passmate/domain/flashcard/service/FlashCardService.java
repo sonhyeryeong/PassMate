@@ -2,7 +2,9 @@ package com.passmate.domain.flashcard.service;
 
 import com.passmate.domain.flashcard.dto.FlashCardDto;
 import com.passmate.domain.flashcard.entity.FlashCard;
+import com.passmate.domain.flashcard.exception.CardValidationException;
 import com.passmate.domain.flashcard.repository.FlashCardRepository;
+import com.passmate.domain.review.repository.ReviewHistoryRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -15,6 +17,7 @@ import java.util.stream.Collectors;
 public class FlashCardService {
 
     private final FlashCardRepository flashCardRepository;
+    private final ReviewHistoryRepository reviewHistoryRepository;
 
     public FlashCardDto.Response getFlashCard(Long flashCardId, Long materialId) {
         FlashCard flashCard = flashCardRepository.findByIdAndMaterialId(flashCardId, materialId)
@@ -34,10 +37,11 @@ public class FlashCardService {
 
     @Transactional
     public FlashCardDto.Response createFlashCard(Long materialId, FlashCardDto.CreateRequest request) {
+        validateCard(request != null ? request.getFront() : null, request != null ? request.getBack() : null);
         FlashCard flashCard = FlashCard.builder()
                 .materialId(materialId)
-                .front(request.getFront())
-                .back(request.getBack())
+                .front(request.getFront().trim())
+                .back(request.getBack().trim())
                 .build();
 
         FlashCard savedFlashCard = flashCardRepository.save(flashCard);
@@ -46,10 +50,11 @@ public class FlashCardService {
 
     @Transactional
     public FlashCardDto.Response updateFlashCard(Long flashCardId, Long materialId, FlashCardDto.UpdateRequest request) {
+        validateCard(request != null ? request.getFront() : null, request != null ? request.getBack() : null);
         FlashCard flashCard = flashCardRepository.findByIdAndMaterialId(flashCardId, materialId)
                 .orElseThrow(() -> new IllegalArgumentException("FlashCard not found"));
 
-        flashCard.update(request.getFront(), request.getBack());
+        flashCard.update(request.getFront().trim(), request.getBack().trim());
         FlashCard updatedFlashCard = flashCardRepository.save(flashCard);
         return toResponse(updatedFlashCard);
     }
@@ -58,7 +63,23 @@ public class FlashCardService {
     public void deleteFlashCard(Long flashCardId, Long materialId) {
         FlashCard flashCard = flashCardRepository.findByIdAndMaterialId(flashCardId, materialId)
                 .orElseThrow(() -> new IllegalArgumentException("FlashCard not found"));
+        reviewHistoryRepository.deleteByFlashCardId(flashCardId);
         flashCardRepository.delete(flashCard);
+    }
+
+    private void validateCard(String front, String back) {
+        if (front == null || front.isBlank()) {
+            throw new CardValidationException("카드 앞면을 입력해 주세요.");
+        }
+        if (back == null || back.isBlank()) {
+            throw new CardValidationException("카드 뒷면을 입력해 주세요.");
+        }
+        if (front.trim().length() > 300) {
+            throw new CardValidationException("카드 앞면은 300자 이하로 입력해 주세요.");
+        }
+        if (back.trim().length() > 600) {
+            throw new CardValidationException("카드 뒷면은 600자 이하로 입력해 주세요.");
+        }
     }
 
     private FlashCardDto.Response toResponse(FlashCard flashCard) {
