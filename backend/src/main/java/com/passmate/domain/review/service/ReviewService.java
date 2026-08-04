@@ -9,7 +9,9 @@ import com.passmate.domain.review.dto.ReviewDto;
 import com.passmate.domain.review.entity.ReviewHistory;
 import com.passmate.domain.review.entity.ReviewResult;
 import com.passmate.domain.review.repository.ReviewHistoryRepository;
+import com.passmate.domain.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
@@ -21,8 +23,11 @@ import java.util.stream.Collectors;
 @Transactional(readOnly = true)
 public class ReviewService {
 
+    private static final int RECENT_HISTORY_LIMIT = 100;
+
     private final ReviewHistoryRepository reviewHistoryRepository;
     private final FlashCardRepository flashCardRepository;
+    private final UserRepository userRepository;
 
     public ReviewDto.Response getReview(Long reviewId) {
         ReviewHistory review = reviewHistoryRepository.findById(reviewId)
@@ -63,6 +68,21 @@ public class ReviewService {
         return ReviewDto.UserReviewListResponse.builder()
                 .items(items)
                 .reviewedDate(date)
+                .build();
+    }
+
+    public ReviewDto.HistoryListResponse getUserReviewHistory(Long userId) {
+        if (!userRepository.existsById(userId)) {
+            throw new ResourceNotFoundException("USER_NOT_FOUND", "프로필을 찾을 수 없습니다.");
+        }
+
+        List<ReviewDto.HistoryItemResponse> items = reviewHistoryRepository
+                .findHistoryItemsByUserId(userId, PageRequest.of(0, RECENT_HISTORY_LIMIT))
+                .stream()
+                .map(this::toHistoryItemResponse)
+                .toList();
+        return ReviewDto.HistoryListResponse.builder()
+                .items(items)
                 .build();
     }
 
@@ -135,6 +155,22 @@ public class ReviewService {
                 .nextReviewAt(flashCard.getNextReviewAt())
                 .createdAt(flashCard.getCreatedAt())
                 .updatedAt(flashCard.getUpdatedAt())
+                .build();
+    }
+
+    private ReviewDto.HistoryItemResponse toHistoryItemResponse(
+            ReviewHistoryRepository.HistoryItemProjection item
+    ) {
+        return ReviewDto.HistoryItemResponse.builder()
+                .id(item.getId())
+                .flashCardId(item.getFlashCardId())
+                .cardFront(item.getCardFront())
+                .materialId(item.getMaterialId())
+                .materialTitle(item.getMaterialTitle())
+                .deckId(item.getDeckId())
+                .deckName(item.getDeckName())
+                .result(item.getResult())
+                .reviewedAt(item.getReviewedAt())
                 .build();
     }
 }

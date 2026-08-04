@@ -1,4 +1,10 @@
-import type { CreateReviewRequest, Review, TodayReviewResponse } from '@/types/review';
+import type {
+  CreateReviewRequest,
+  Review,
+  ReviewHistoryItem,
+  ReviewHistoryResponse,
+  TodayReviewResponse,
+} from '@/types/review';
 import type { FlashCard } from '@/types/flashcard';
 import { request } from '@/lib/apiClient';
 
@@ -16,4 +22,9 @@ export async function createReview(
     method: 'POST',
     body: JSON.stringify(payload),
   });
+}
+
+export async function getReviewHistory(userId: number): Promise<ReviewHistoryItem[]> {
+  const data = await request<ReviewHistoryResponse>(`/reviews/users/${userId}/history`);
+  return data.items;
 }

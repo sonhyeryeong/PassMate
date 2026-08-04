@@ -19,3 +19,19 @@ export interface Review {
   reviewedAt: string;
   createdAt: string;
 }
+
+export interface ReviewHistoryItem {
+  id: number;
+  flashCardId: number;
+  cardFront: string;
+  materialId: number;
+  materialTitle: string;
+  deckId: number;
+  deckName: string;
+  result: ReviewResult;
+  reviewedAt: string;
+}
+
+export interface ReviewHistoryResponse {
+  items: ReviewHistoryItem[];
+}

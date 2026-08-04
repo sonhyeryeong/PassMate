@@ -107,7 +107,12 @@ export default function ReviewPage() {
       active="review"
       eyebrow="오늘의 복습"
       title="카드 복습"
-      actions={<span className="deck-count">{progressText}</span>}
+      actions={(
+        <>
+          <Link className="secondary-button" href="/review/history">복습 기록</Link>
+          <span className="deck-count">{progressText}</span>
+        </>
+      )}
     >
       {loadState === 'loading' && (
         <div className="status-box" role="status">

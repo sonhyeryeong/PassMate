@@ -78,6 +78,36 @@ MVP1에서는 최소 사용자 정보만 다룬다.
 GET /api/users/me
 ```
 
+## Review History API
+
+사용자의 복습 기록 화면은 카드, 학습 세트, 폴더 정보를 추가 요청 없이 표시할 수 있는 전용 조회 API를 사용한다.
+
+```text
+GET /api/reviews/users/{userId}/history
+```
+
+```json
+{
+  "items": [
+    {
+      "id": 31,
+      "flashCardId": 12,
+      "cardFront": "제1정규형이란?",
+      "materialId": 7,
+      "materialTitle": "데이터베이스 정규화",
+      "deckId": 3,
+      "deckName": "정보처리기사",
+      "result": "GOOD",
+      "reviewedAt": "2026-07-27T19:20:00"
+    }
+  ]
+}
+```
+
+- 최신 복습 기록부터 최대 100건을 반환한다.
+- ReviewHistory의 `userId`와 카드가 속한 폴더의 `userId`를 함께 확인한다.
+- 화면에서 폴더와 학습 세트 필터에 사용할 식별자와 이름을 포함한다.
+
 ## Dashboard API
 
 대시보드는 화면에서 여러 도메인 API를 직접 조합하지 않고 전용 집계 API를 사용한다.

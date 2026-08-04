@@ -926,6 +926,106 @@ a {
   text-align: center;
 }
 
+.review-history-filter {
+  display: grid;
+  gap: 18px;
+}
+
+.review-history-filter__fields {
+  display: grid;
+  gap: 10px;
+}
+
+.review-history-filter__fields label {
+  display: grid;
+  gap: 6px;
+  color: #344054;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.review-history-filter__fields select {
+  min-height: 40px;
+  border: 1px solid #cfd8e6;
+  border-radius: 6px;
+  background: #ffffff;
+  color: #172033;
+  padding: 8px 10px;
+}
+
+.review-history-table-wrap {
+  overflow-x: auto;
+  border: 1px solid #dfe5ee;
+  border-radius: 8px;
+  background: #ffffff;
+  box-shadow: 0 6px 20px rgba(34, 51, 84, 0.06);
+}
+
+.review-history-table {
+  width: 100%;
+  min-width: 760px;
+  border-collapse: collapse;
+}
+
+.review-history-table th,
+.review-history-table td {
+  border-bottom: 1px solid #e7ebf1;
+  padding: 13px 14px;
+  text-align: left;
+  vertical-align: middle;
+}
+
+.review-history-table th {
+  background: #f8fafc;
+  color: #475467;
+  font-size: 12px;
+}
+
+.review-history-table td {
+  color: #344054;
+  font-size: 13px;
+}
+
+.review-history-table td:nth-child(2) strong,
+.review-history-table td:nth-child(2) span {
+  display: block;
+}
+
+.review-history-table td:nth-child(2) span {
+  margin-top: 4px;
+  color: #667085;
+  font-size: 12px;
+}
+
+.review-history-table tbody tr:last-child td {
+  border-bottom: 0;
+}
+
+.review-result-badge {
+  display: inline-flex;
+  border-radius: 999px;
+  background: #eef4ff;
+  color: #2458d3;
+  padding: 5px 9px;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.review-result-badge--again {
+  background: #fff1f0;
+  color: #b42318;
+}
+
+.review-result-badge--hard {
+  background: #fff7e6;
+  color: #b54708;
+}
+
+.review-result-badge--easy {
+  background: #ecfdf3;
+  color: #027a48;
+}
+
 .profile-panel {
   gap: 18px;
 }
@@ -1181,6 +1281,15 @@ a {
 
   .review-actions {
     grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+
+  .review-history-filter {
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: end;
+  }
+
+  .review-history-filter__fields {
+    grid-template-columns: repeat(2, minmax(180px, 220px));
   }
 
   .bottom-nav {

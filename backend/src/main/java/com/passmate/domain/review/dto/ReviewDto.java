@@ -45,6 +45,30 @@ public class ReviewDto {
     @NoArgsConstructor
     @AllArgsConstructor
     @Builder
+    public static class HistoryItemResponse {
+        private Long id;
+        private Long flashCardId;
+        private String cardFront;
+        private Long materialId;
+        private String materialTitle;
+        private Long deckId;
+        private String deckName;
+        private ReviewResult result;
+        private LocalDateTime reviewedAt;
+    }
+
+    @Getter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    @Builder
+    public static class HistoryListResponse {
+        private List<HistoryItemResponse> items;
+    }
+
+    @Getter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    @Builder
     public static class UserReviewListResponse {
         private List<Response> items;
         private LocalDateTime reviewedDate;

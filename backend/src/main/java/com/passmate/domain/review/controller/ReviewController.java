@@ -30,6 +30,11 @@ public class ReviewController {
         return ResponseEntity.ok(reviewService.getUserReviews(userId));
     }
 
+    @GetMapping("/users/{userId}/history")
+    public ResponseEntity<ReviewDto.HistoryListResponse> getUserReviewHistory(@PathVariable Long userId) {
+        return ResponseEntity.ok(reviewService.getUserReviewHistory(userId));
+    }
+
     @GetMapping("/users/{userId}/today")
     public ResponseEntity<ReviewDto.TodayReviewResponse> getUserTodayReviews(
             @PathVariable Long userId,
