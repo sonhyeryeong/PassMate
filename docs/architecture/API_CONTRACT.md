@@ -1,4 +1,6 @@
-# Step 4. PassMate MVP1 API 설계
+# PassMate MVP1 API 계약
+
+> **책임:** API 경로·입출력·권한. 공통 응답 규약은 [API_STYLE.md](../../API_STYLE.md), 데이터 의미는 [DATA_MODEL.md](DATA_MODEL.md)를 따른다.
 
 ## 목적
 
@@ -172,3 +174,9 @@ GET /api/dashboard?userId={userId}
 - Quiz API
 - 결제 API
 - 공유 Deck API
+
+## 구현 확인 사항 (2026-10-22)
+
+- 복습 API 서비스는 카드 소유권을 확인한 뒤 결과를 기록하고 `nextReviewAt`을 갱신한다.
+- 사용자 화면의 `복습 시작` 링크는 현재 `/review`로 이동한다. 학습 세트 단위 복습 필터는 구현 확인이 필요하다.
+- 이 문서의 예시 응답과 실제 컨트롤러·DTO 계약이 다를 경우 실제 코드를 우선 파악하고 차이를 보고한 뒤 문서를 수정한다.

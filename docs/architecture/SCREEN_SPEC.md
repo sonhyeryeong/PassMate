@@ -1,4 +1,6 @@
-# Step 5. PassMate MVP1 화면 설계
+# PassMate MVP1 화면 설계
+
+> **책임:** 화면·라우트·컴포넌트·상호작용. 사용자 흐름은 [USER_FLOW.md](USER_FLOW.md), API 계약은 [API_CONTRACT.md](API_CONTRACT.md)를 따른다.
 
 ## 목적
 
@@ -585,3 +587,10 @@ Mobile:
 - 공유 Deck
 - 팀/조직 기능
 - 공개 마켓플레이스
+
+## 현재 코드와의 차이 (2026-10-22)
+
+- `frontend/src/app/review/page.tsx`에는 복습 카드 조회, 정답 공개, 네 단계 결과 제출, 완료/오류/빈 상태가 **이미 구현되어 있다**. 과거 README의 '복습 UI 미완성' 설명을 현황으로 간주하지 않는다.
+- `frontend/src/app/deck/[deckId]/category/[categoryId]/material/[materialId]/page.tsx`는 `/folder/[folderId]/set/[setId]`로 리다이렉트하는 호환 라우트다. 삭제 전 외부 링크 사용 여부를 확인한다.
+- 학습 세트 상세의 `복습 시작`은 현재 `/review` 전체 복습으로 이동한다. 세트별 필터 동작은 별도 검토한다.
+- 위 사항은 소스 정적 검토 결과이며 브라우저 E2E 검증은 하지 않았다.

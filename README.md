@@ -220,3 +220,13 @@ git config --global --add safe.directory D:/workspace/PassMate
 - [FRONTEND.md](FRONTEND.md)
 - [API_STYLE.md](API_STYLE.md)
 - [docs/architecture](docs/architecture)
+
+## 설계 문서 안내
+
+- [제품 비전](docs/PRODUCT_VISION.md): 장기 기억 유지와 기능 도입 기준
+- [사용자 흐름](docs/architecture/USER_FLOW.md): 사용자 시나리오·메뉴·완료 기준
+- [데이터 모델](docs/architecture/DATA_MODEL.md): ERD·복습 상태
+- [API 계약](docs/architecture/API_CONTRACT.md): API 경로와 응답
+- [화면 설계](docs/architecture/SCREEN_SPEC.md): 화면별 책임·라우트
+
+개발 시 변경된 계약에 해당하는 문서만 함께 갱신한다. 제품 범위는 [ARCHITECTURE.md](ARCHITECTURE.md)를 기준으로 한다.

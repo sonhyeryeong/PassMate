@@ -6,6 +6,15 @@
 
 AI 에이전트는 이 문서를 기준으로 프로젝트 구조를 이해하고, 임의로 구조를 바꾸지 않는다.
 
+## 제품 비전과 구조의 관계
+
+제품의 최상위 목표와 신규 기능 판단 기준은 [`docs/PRODUCT_VISION.md`](docs/PRODUCT_VISION.md)를 따른다.
+
+- 핵심 목표는 다양한 공부법 제공이 아니라 **장기 기억 유지**이다.
+- 현재 `Material → FlashCard → ReviewHistory` 구조를 유지하면서, 회상 결과에 따라 다음 복습을 결정하는 흐름을 완성한다.
+- MVP1은 기존 복습 흐름과 기본 일정 계산을 완성하는 단계로 유지한다. 적응형 알고리즘 고도화나 신규 학습 방식은 MVP1에 임의로 포함하지 않는다.
+- 학습 방식이 추가되더라도 복습 이력의 의미와 현재 학습 상태를 명확히 구분하고, 동일한 결과로 간주하기 전에 검증한다.
+
 ## 설계 우선
 
 - 구현보다 설계 문서를 우선 신뢰한다.
@@ -101,11 +110,10 @@ Category는 사용자에게 필수 생성 단계로 노출하지 않는다. 필�
 
 ```text
 docs/architecture/
-  step1_user_scenario_mvp1.md
-  step2_information_architecture_mvp1.md
-  step3_erd_mvp1.md
-  step4_api_design_mvp1.md
-  step5_screen_design_mvp1.md
+  USER_FLOW.md
+  DATA_MODEL.md
+  API_CONTRACT.md
+  SCREEN_SPEC.md
 ```
 
 구현 전 반드시 관련 문서를 읽는다.
