@@ -110,11 +110,10 @@ Category는 사용자에게 필수 생성 단계로 노출하지 않는다. 필�
 
 ```text
 docs/architecture/
-  step1_user_scenario_mvp1.md
-  step2_information_architecture_mvp1.md
-  step3_erd_mvp1.md
-  step4_api_design_mvp1.md
-  step5_screen_design_mvp1.md
+  USER_FLOW.md
+  DATA_MODEL.md
+  API_CONTRACT.md
+  SCREEN_SPEC.md
 ```
 
 구현 전 반드시 관련 문서를 읽는다.
