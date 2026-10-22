@@ -94,11 +94,10 @@ Category  → 기본 섹션 또는 내부 분류
 
 ```text
 docs/architecture/
-  step1_user_scenario_mvp1.md
-  step2_information_architecture_mvp1.md
-  step3_erd_mvp1.md
-  step4_api_design_mvp1.md
-  step5_screen_design_mvp1.md
+  USER_FLOW.md
+  DATA_MODEL.md
+  API_CONTRACT.md
+  SCREEN_SPEC.md
 ```
 
 ## 설계 우선 규칙
@@ -107,7 +106,7 @@ docs/architecture/
 - 설계 문서와 코드가 충돌하면 사용자에게 알린다.
 - MVP1 범위 밖 기능은 사용자가 명시적으로 요청하지 않는 한 구현하지 않는다.
 - 구조 변경은 `ARCHITECTURE.md`를 기준으로 판단한다.
-- 화면 작업은 `docs/architecture/step5_screen_design_mvp1.md`를 우선 기준으로 삼는다.
+- 화면 작업은 `docs/architecture/SCREEN_SPEC.md`를 우선 기준으로 삼는다.
 - PassMate 화면은 데스크톱 웹 서비스를 우선으로 설계하고, 모바일 PWA는 복습과 핵심 조회 중심으로 축소한다.
 - 화면의 기본 구조는 Header, Sidebar, Main Content를 사용하는 관리형 웹 서비스 레이아웃이다.
 - 학습 세트와 카드는 독립 메뉴로 만들지 않고 폴더 상세 흐름 안에서 접근한다.
@@ -214,3 +213,11 @@ npm run dev
 사용자가 직접 수행해야 하는 작업이 하나라도 있다면 절대 생략하지 않는다.
 
 AI가 대신 수행할 수 없는 작업은 반드시 사용자에게 명확하게 안내한다.
+
+## 문서 갱신과 구현 일치 확인
+
+- 문서 책임의 원본: 제품 목적 `docs/PRODUCT_VISION.md`, 범위·도메인 `ARCHITECTURE.md`, 사용자 흐름 `docs/architecture/USER_FLOW.md`, 데이터 `DATA_MODEL.md`, API `API_CONTRACT.md`, 화면 `SCREEN_SPEC.md`.
+- API·데이터·사용자 흐름·화면의 **계약이 변경된 경우에만** 같은 작업 단위에서 해당 원본 문서를 갱신한다. 단순 코드 정리로 문서를 불필요하게 수정하지 않는다.
+- 설계와 코드가 다르면 현재 구현·목표 설계·미구현을 구분하고 사용자에게 알린다. 검증하지 않은 내용을 완료로 표시하지 않는다.
+- 작업 보고에 `관련 문서 갱신 여부`, 검증 결과, 미확인 사항을 포함한다.
+- 같은 정책을 복사하지 않고 원본 문서에 링크한다.
