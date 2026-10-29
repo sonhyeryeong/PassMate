@@ -41,7 +41,7 @@ Next 빌드와 E2E의 개발 서버는 같은 `.next`를 사용하므로 한 체
 
 [검증 워크플로](../.github/workflows/verify.yml)는 소스·검증 설정 변경의 push/PR에서 다음을 수행한다.
 
-- Backend: JDK 17에서 Maven 전체 테스트.
+- Backend: JDK 17에서 Maven 전체 테스트. 폐기 가능한 PostgreSQL 17 서비스로 migration·FK·인증 세션·사용자 격리도 검증.
 - Frontend: Node.js 22에서 잠금 파일 설치, 공통 테스트·타입 검사·린트·빌드.
 - E2E: 앞 두 작업 성공 후 별도 작업 공간에서 실제 API를 연결한 Chromium 테스트. 실패 시 추적·보고서 보관.
 
@@ -77,6 +77,16 @@ Skill 검증은 다음을 구분한다.
 행동 사례는 부모 에이전트가 결과 파일·변경 없음·보고를 대조한 결과이며 사람의 최종 행동 평가 PASS가 아니다. 변경 전후 Skill 비교도 하지 않았으므로 성능 향상이나 일반적인 준수율을 입증하지 않는다. 실제 제품 결함 수정 전후 E2E 비교와 이 두 합성 행동 관찰은 별개의 증거다.
 
 실행 산출물은 `backend/target/harness-pilot/before/`, `frontend/e2e-race-before.log`, `frontend/e2e-harness-after.log`에 있다. 임시 평가 폴더·로그·보고서는 Git에 포함하지 않는다. Skill 문법 검사와 actionlint 1.7.12 검사를 통과했다. 원격 GitHub Actions·Linux 실행, 모바일·PostgreSQL 검증은 미실행이다.
+
+## 일반 인증 구현 검증 (2026-10-29)
+
+`implement` 절차와 프로젝트 `passmate-review`의 소유 관계·삭제·기록 보존 관점을 적용했다. 이번 작업에 독립 에이전트를 추가 실행하지 않았다.
+
+- 실제 Spring Security와 JDBC 세션으로 가입·로그인·CSRF·세션 교체·로그아웃·24시간 만료·요청 제한을 검사했다.
+- 로그인한 A/B가 폴더·섹션·세트·카드·복습 기록의 조회·생성·수정·삭제를 교차 호출해 404와 데이터 보존을 확인했다.
+- PostgreSQL V1의 기존 사용자·폴더를 남긴 채 V2/V3 업그레이드를 검증했다. 원격 Supabase에 새 migration을 적용한 결과와는 구분한다.
+- Chromium 데스크톱·모바일 흐름은 가입·로그인·학습·복습·로그아웃·위조한 localStorage 무효화를 검사한다. 페이지 초기 준비 전 입력 유실을 발견해 폼 준비 전 입력을 막고 동일 시나리오를 재검증했다.
+- 백엔드 전체 56건과 추가 PostgreSQL 인증 4건, 프론트 단위 10건, Chromium E2E 6건을 통과했다. 타입 검사·린트·빌드도 통과했다. 원격 CI·Google OAuth·외부 호스팅·복수 탭과 실제 모바일 기기 검증은 별도다.
 
 ## 참고한 공식 문서
 

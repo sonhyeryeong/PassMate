@@ -53,13 +53,13 @@ public class UserService {
 
     @Transactional
     public UserDto.Response updateUser(Long userId, UserDto.UpdateRequest request) {
-        if (request == null || request.getNickname() == null || request.getNickname().isBlank()) {
+        if (request == null || request.getNickname() == null || request.getNickname().isBlank() || request.getNickname().trim().length() > 30) {
             throw new InvalidRequestException("USER_VALIDATION_ERROR", "닉네임을 입력해 주세요.");
         }
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new ResourceNotFoundException("USER_NOT_FOUND", "프로필을 찾을 수 없습니다."));
 
-        user.updateNickname(request.getNickname());
+        user.updateNickname(request.getNickname().trim());
         User updatedUser = userRepository.save(user);
         return toResponse(updatedUser);
     }
@@ -85,7 +85,7 @@ public class UserService {
         if (request == null || request.getEmail() == null || request.getEmail().isBlank()) {
             throw new InvalidRequestException("USER_VALIDATION_ERROR", "이메일을 입력해 주세요.");
         }
-        if (request.getNickname() == null || request.getNickname().isBlank()) {
+        if (request.getNickname() == null || request.getNickname().isBlank() || request.getNickname().trim().length() > 30) {
             throw new InvalidRequestException("USER_VALIDATION_ERROR", "닉네임을 입력해 주세요.");
         }
     }

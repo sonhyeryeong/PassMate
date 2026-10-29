@@ -1,6 +1,10 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
+  async rewrites() {
+    const backend = process.env.PASSMATE_BACKEND_URL ?? 'http://127.0.0.1:8080';
+    return [{source:'/api/:path*', destination:`${backend}/api/:path*`}];
+  },
   swcMinify: true,
   
   // PWA configuration
@@ -11,7 +15,7 @@ const nextConfig = {
         headers: [
           {
             key: 'Cache-Control',
-            value: 'public, max-age=3600, must-revalidate'
+            value: 'private, no-store'
           }
         ]
       }

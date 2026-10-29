@@ -2,12 +2,12 @@
 
 PassMate는 학습 자료를 Deck, Category, Material, FlashCard로 정리하고 반복 복습하는 개인 학습용 PWA입니다.
 
-현재 단계는 MVP1이며, 인증 없이 로컬 개발용 사용자 선택 방식으로 동작합니다.
+현재 단계는 MVP1이며, 아이디·비밀번호 회원가입과 서버 세션 로그인으로 동작합니다. Google 로그인과 외부 배포는 후속 작업입니다.
 
 ## 기술 스택
 
 - Backend: Spring Boot 3.3.0, Java 17, Maven, Spring Data JPA
-- Database: H2 file DB
+- Database: 로컬 H2 / PostgreSQL 전환 기반(Flyway, Supabase Free 연결 확인)
 - Frontend: Next.js 14, React 18, TypeScript
 
 ## 사전 설치
@@ -102,17 +102,13 @@ npm.cmd run dev
 http://localhost:3000
 ```
 
-프론트엔드는 기본적으로 아래 API 주소를 사용합니다.
+프론트엔드는 같은 출처의 `/api`로 요청하고 Next.js가 기본 `http://127.0.0.1:8080/api`로 전달합니다. 다른 백엔드 주소를 사용하면 `frontend/.env.local`에 서버 전용 변수를 설정하고 프론트엔드를 재시작합니다.
 
 ```text
-http://localhost:8080/api
+PASSMATE_BACKEND_URL=http://127.0.0.1:8080
 ```
 
-다른 백엔드 주소를 사용해야 하면 `frontend/.env.local`에 값을 추가합니다.
-
-```text
-NEXT_PUBLIC_API_BASE_URL=http://localhost:8080/api
-```
+기존 `NEXT_PUBLIC_API_BASE_URL`을 설정했다면 제거해 기본 `/api`를 사용합니다. DB 비밀번호는 프론트엔드에 넣지 않습니다.
 
 ## 개발 검증 명령
 
@@ -141,7 +137,7 @@ npm.cmd run build
 
 현재 구현된 주요 흐름은 다음과 같습니다.
 
-1. 사용자 생성 또는 기존 사용자 선택
+1. 회원가입 후 아이디·비밀번호 로그인
 2. Deck 생성 및 목록 조회
 3. Deck 안에 Category 생성
 4. Category 안에 Material 생성
@@ -154,6 +150,8 @@ npm.cmd run build
 백엔드는 저장소 루트에서 `mvn -f backend/pom.xml test`로 검증합니다. 프론트엔드는 `frontend`에서 `npm test`, `npm run type-check`, `npm run lint`, `npm run build`를 실행합니다.
 
 종단 간 테스트는 JDK 17과 Maven이 실행 경로에 있는 환경에서 `frontend`의 `npm run test:e2e`로 실행합니다. 최초 환경에서는 `npm ci` 및 `npx playwright install chromium`으로 테스트 의존성과 브라우저를 준비합니다. Playwright는 실제 Spring API와 Next.js를 실행하며, 전용 메모리 H2 DB를 사용합니다. 기존 로컬 파일 DB는 사용하지 않습니다. 포트 18080과 3000이 사용 중이면 테스트는 기존 서버를 재사용하지 않고 중단합니다.
+
+`learning-journey.spec.ts`는 화면에서 회원가입·로그인 후 폴더·학습 세트·카드를 생성하고 복습 기록까지 확인합니다. 입력 오류, 저장 전 실패 응답 후 재시도, 저장 후 새로고침과 모바일 Chromium 화면 모방을 포함합니다. 기존 `review.spec.ts`는 세트 범위·삭제·늦은 응답 전환을 검사합니다. 실제 모바일 기기나 다른 브라우저 검증을 대체하지 않습니다.
 
 AI 작업 분류·선택적 독립 검토·CI·행동 평가의 적용 범위와 파일럿 결과는 [AI 개발 운영](docs/AI_WORKFLOW.md)을 참고하세요. 로컬 검증과 원격 CI 실행 결과는 구분합니다.
 
@@ -230,6 +228,9 @@ git config --global --add safe.directory D:/workspace/PassMate
 - [docs/architecture](docs/architecture)
 
 ## 설계 문서 안내
+
+- [외부 공개 베타 설계안](docs/architecture/PUBLIC_BETA_DESIGN.md): 아이디·비밀번호 + Google 로그인, 재설정 후속으로 범위 확정. Vercel·Render·Supabase 무료 구성을 선택했습니다. DB 전환 기반과 일반 인증·사용자 격리를 구현했으며 Google 인증·외부 배포는 미완료입니다.
+- [Supabase 연결 준비](docs/SUPABASE_SETUP.md): 무료 프로젝트 생성과 로컬 PostgreSQL 연결 검증 절차입니다.
 
 - [제품 비전](docs/PRODUCT_VISION.md): 장기 기억 유지와 기능 도입 기준
 - [사용자 흐름](docs/architecture/USER_FLOW.md): 사용자 시나리오·메뉴·완료 기준

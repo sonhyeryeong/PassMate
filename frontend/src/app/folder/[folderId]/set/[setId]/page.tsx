@@ -11,7 +11,7 @@ import { getFolder, type Folder } from '@/lib/folderApi';
 import { getStudySetInFolder, type StudySet } from '@/lib/studySetApi';
 import type { FlashCard } from '@/types/flashcard';
 
-const SELECTED_USER_KEY = 'passmate.selectedUser';
+import { useCurrentUser } from '@/components/AuthGate';
 
 type LoadState = 'loading' | 'success' | 'error';
 
@@ -24,6 +24,7 @@ function formatDate(value: string) {
 }
 
 export default function StudySetDetailPage() {
+  const currentUser = useCurrentUser();
   const params = useParams<{ folderId: string; setId: string }>();
   const folderId = useMemo(() => Number(params.folderId), [params.folderId]);
   const setId = useMemo(() => Number(params.setId), [params.setId]);
@@ -39,11 +40,11 @@ export default function StudySetDetailPage() {
   const [isDeleting, setIsDeleting] = useState(false);
 
   useEffect(() => {
-    const savedUserId = window.localStorage.getItem(SELECTED_USER_KEY);
+    const savedUserId = String(currentUser.id);
 
     if (!savedUserId) {
       setLoadState('error');
-      setMessage('먼저 사용할 프로필을 선택해 주세요.');
+      setMessage('로그인이 필요합니다.');
       return;
     }
 
@@ -74,7 +75,7 @@ export default function StudySetDetailPage() {
     }
 
     void loadStudySet(Number(savedUserId));
-  }, [folderId, setId]);
+  }, [folderId, setId, currentUser.id]);
 
   async function handleSaveCard(front: string, back: string) {
     if (editingCard === null) {

@@ -7,7 +7,7 @@ import { ApiError, getErrorMessage } from '@/lib/apiClient';
 import { getReviewHistory } from '@/lib/reviewApi';
 import type { ReviewHistoryItem, ReviewResult } from '@/types/review';
 
-const SELECTED_USER_KEY = 'passmate.selectedUser';
+import { useCurrentUser } from '@/components/AuthGate';
 
 type LoadState = 'loading' | 'success' | 'error';
 type ErrorKind = 'profile' | 'request';
@@ -27,6 +27,7 @@ function formatReviewedAt(value: string): string {
 }
 
 export default function ReviewHistoryPage() {
+  const currentUser = useCurrentUser();
   const [userId, setUserId] = useState<number | null>(null);
   const [items, setItems] = useState<ReviewHistoryItem[]>([]);
   const [loadState, setLoadState] = useState<LoadState>('loading');
@@ -51,19 +52,19 @@ export default function ReviewHistoryPage() {
   }, []);
 
   useEffect(() => {
-    const savedUserId = window.localStorage.getItem(SELECTED_USER_KEY);
+    const savedUserId = String(currentUser.id);
     const userId = savedUserId ? Number(savedUserId) : null;
 
     if (!userId || !Number.isInteger(userId)) {
       setLoadState('error');
       setErrorKind('profile');
-      setMessage('먼저 사용할 프로필을 선택해 주세요.');
+      setMessage('로그인이 필요합니다.');
       return;
     }
 
     setUserId(userId);
     void loadHistory(userId);
-  }, [loadHistory]);
+  }, [loadHistory, currentUser.id]);
 
   const deckOptions = useMemo(
     () => Array.from(
@@ -114,7 +115,7 @@ export default function ReviewHistoryPage() {
           <p>{message}</p>
           <div className="status-actions">
             {errorKind === 'profile' ? (
-              <Link className="secondary-button" href="/">프로필 선택으로 이동</Link>
+              <Link className="secondary-button" href="/">로그인으로 이동</Link>
             ) : (
               <button
                 className="secondary-button"

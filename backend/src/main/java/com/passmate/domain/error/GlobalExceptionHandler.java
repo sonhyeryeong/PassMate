@@ -14,6 +14,16 @@ import org.springframework.web.method.annotation.MethodArgumentTypeMismatchExcep
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
+    @ExceptionHandler(org.springframework.web.servlet.resource.NoResourceFoundException.class)
+    public ResponseEntity<ApiErrorResponse> handleMissingRoute(Exception exception) {
+        return ResponseEntity.status(404).body(new ApiErrorResponse("NOT_FOUND", "요청한 경로를 찾을 수 없습니다."));
+    }
+
+    @ExceptionHandler(org.springframework.security.core.AuthenticationException.class)
+    public ResponseEntity<ApiErrorResponse> handleAuthentication(Exception exception) {
+        return ResponseEntity.status(401).body(new ApiErrorResponse("AUTH_REQUIRED", "로그인이 필요합니다."));
+    }
+
     @ExceptionHandler(ApiException.class)
     public ResponseEntity<ApiErrorResponse> handleApiException(ApiException exception) {
         return ResponseEntity.status(exception.getStatus())

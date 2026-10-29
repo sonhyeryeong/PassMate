@@ -1,0 +1,38 @@
+# 로컬에서 Supabase 연결과 인증을 검증하는 용도다. 공개 배포 프로필이 아니다.
+spring:
+  session:
+    jdbc:
+      initialize-schema: never
+  datasource:
+    url: ${PASSMATE_DB_URL}
+    username: ${PASSMATE_DB_USERNAME}
+    password: ${PASSMATE_DB_PASSWORD}
+    driver-class-name: org.postgresql.Driver
+    hikari:
+      maximum-pool-size: 3
+      minimum-idle: 0
+      connection-timeout: 10000
+      schema: passmate
+  flyway:
+    enabled: true
+    locations: classpath:db/migration/postgresql
+    default-schema: passmate
+    schemas: passmate
+    baseline-on-migrate: false
+    clean-disabled: true
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    properties:
+      hibernate:
+        default_schema: passmate
+  h2:
+    console:
+      enabled: false
+
+server:
+  address: 127.0.0.1
+
+logging:
+  level:
+    com.passmate: INFO

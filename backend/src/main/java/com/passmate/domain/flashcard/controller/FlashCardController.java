@@ -3,6 +3,8 @@ package com.passmate.domain.flashcard.controller;
 import com.passmate.domain.flashcard.dto.FlashCardDto;
 import com.passmate.domain.flashcard.service.FlashCardService;
 import lombok.RequiredArgsConstructor;
+import com.passmate.common.security.CurrentUser;
+import com.passmate.common.security.Ownership;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -11,12 +13,17 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/materials/{materialId}/cards")
 @RequiredArgsConstructor
 public class FlashCardController {
+    private final CurrentUser currentUser;
+    private final Ownership ownership;
+
 
     private final FlashCardService flashCardService;
 
     @GetMapping
     public ResponseEntity<FlashCardDto.ListResponse> getMaterialFlashCards(
             @PathVariable Long materialId) {
+        Long userId = currentUser.id();
+        ownership.material(materialId);
         return ResponseEntity.ok(flashCardService.getMaterialFlashCards(materialId));
     }
 
@@ -24,6 +31,8 @@ public class FlashCardController {
     public ResponseEntity<FlashCardDto.Response> getFlashCard(
             @PathVariable Long materialId,
             @PathVariable Long cardId) {
+        Long userId = currentUser.id();
+        ownership.material(materialId);
         return ResponseEntity.ok(flashCardService.getFlashCard(cardId, materialId));
     }
 
@@ -31,6 +40,8 @@ public class FlashCardController {
     public ResponseEntity<FlashCardDto.Response> createFlashCard(
             @PathVariable Long materialId,
             @RequestBody FlashCardDto.CreateRequest request) {
+        Long userId = currentUser.id();
+        ownership.material(materialId);
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(flashCardService.createFlashCard(materialId, request));
     }
@@ -40,14 +51,17 @@ public class FlashCardController {
             @PathVariable Long materialId,
             @PathVariable Long cardId,
             @RequestBody FlashCardDto.UpdateRequest request) {
+        Long userId = currentUser.id();
+        ownership.material(materialId);
         return ResponseEntity.ok(flashCardService.updateFlashCard(cardId, materialId, request));
     }
 
     @DeleteMapping("/{cardId}")
     public ResponseEntity<Void> deleteFlashCard(
             @PathVariable Long materialId,
-            @PathVariable Long cardId,
-            @RequestParam Long userId) {
+            @PathVariable Long cardId) {
+        Long userId = currentUser.id();
+        ownership.material(materialId);
         flashCardService.deleteFlashCard(cardId, materialId, userId);
         return ResponseEntity.noContent().build();
     }

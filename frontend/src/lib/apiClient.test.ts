@@ -91,6 +91,7 @@ test('Headers 객체로 전달한 헤더를 보존하고 문자열 본문에 JSO
   let receivedHeaders: Headers | undefined;
 
   globalThis.fetch = async (_input, init) => {
+    if (String(_input).endsWith('/auth/csrf')) return Response.json({token:'csrf-test',headerName:'X-CSRF-TOKEN'});
     receivedHeaders = new Headers(init?.headers);
     return Response.json({ id: 1 });
   };
@@ -103,12 +104,14 @@ test('Headers 객체로 전달한 헤더를 보존하고 문자열 본문에 JSO
 
   assert.equal(receivedHeaders?.get('Authorization'), 'Bearer test-token');
   assert.equal(receivedHeaders?.get('Content-Type'), 'application/json');
+  assert.equal(receivedHeaders?.get('X-CSRF-TOKEN'), 'csrf-test');
 });
 
 test('FormData 본문에는 Content-Type을 강제로 지정하지 않는다', async () => {
   let receivedHeaders: Headers | undefined;
 
   globalThis.fetch = async (_input, init) => {
+    if (String(_input).endsWith('/auth/csrf')) return Response.json({token:'csrf-test',headerName:'X-CSRF-TOKEN'});
     receivedHeaders = new Headers(init?.headers);
     return Response.json({ id: 1 });
   };
@@ -125,6 +128,7 @@ test('호출자가 지정한 Content-Type을 덮어쓰지 않는다', async () =
   let receivedHeaders: Headers | undefined;
 
   globalThis.fetch = async (_input, init) => {
+    if (String(_input).endsWith('/auth/csrf')) return Response.json({token:'csrf-test',headerName:'X-CSRF-TOKEN'});
     receivedHeaders = new Headers(init?.headers);
     return Response.json({ id: 1 });
   };
@@ -151,7 +155,7 @@ test('성공 응답이 JSON이 아니면 잘못된 응답으로 변환한다', a
 });
 
 test('본문이 없는 성공 응답은 undefined를 반환한다', async () => {
-  globalThis.fetch = async () => new Response(null, { status: 204 });
+  globalThis.fetch = async (input) => String(input).endsWith('/auth/csrf') ? Response.json({token:'csrf-test',headerName:'X-CSRF-TOKEN'}) : new Response(null, {status:204});
 
   assert.equal(await request('/decks/1', { method: 'DELETE' }), undefined);
 });

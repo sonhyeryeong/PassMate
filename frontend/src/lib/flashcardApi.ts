@@ -32,8 +32,8 @@ export async function updateFlashCard(
   });
 }
 
-export async function deleteFlashCard(materialId: number, cardId: number, userId: number): Promise<void> {
-  await request<void>(`/materials/${materialId}/cards/${cardId}?userId=${userId}`, {
+export async function deleteFlashCard(materialId: number, cardId: number, _userId: number): Promise<void> {
+  await request<void>(`/materials/${materialId}/cards/${cardId}`, {
     method: 'DELETE',
   });
 }

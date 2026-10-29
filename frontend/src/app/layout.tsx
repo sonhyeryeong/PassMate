@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import React from 'react';
 import './globals.css';
+import { AuthGate } from '@/components/AuthGate';
 
 export const metadata: Metadata = {
   title: 'PassMate - 개인 학습 플랫폼',
@@ -15,7 +16,7 @@ export default function RootLayout({
   return (
     <html lang="ko">
       <body>
-        {children}
+        <AuthGate>{children}</AuthGate>
       </body>
     </html>
   );

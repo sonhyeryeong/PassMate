@@ -6,7 +6,7 @@ import { AppShell } from '@/components/AppShell';
 import { getErrorMessage } from '@/lib/apiClient';
 import { createFolder, getFolders, type Folder } from '@/lib/folderApi';
 
-const SELECTED_USER_KEY = 'passmate.selectedUser';
+import { useCurrentUser } from '@/components/AuthGate';
 
 type LoadState = 'loading' | 'success' | 'error';
 type SubmitState = 'idle' | 'submitting';
@@ -20,6 +20,7 @@ function formatDate(value: string) {
 }
 
 export default function FolderListPage() {
+  const currentUser = useCurrentUser();
   const [userId, setUserId] = useState<number | null>(null);
   const [folders, setFolders] = useState<Folder[]>([]);
   const [loadState, setLoadState] = useState<LoadState>('loading');
@@ -30,16 +31,16 @@ export default function FolderListPage() {
   const [message, setMessage] = useState('');
 
   useEffect(() => {
-    const savedUserId = window.localStorage.getItem(SELECTED_USER_KEY);
+    const savedUserId = String(currentUser.id);
 
     if (!savedUserId) {
       setLoadState('error');
-      setMessage('먼저 사용할 프로필을 선택해 주세요.');
+      setMessage('로그인이 필요합니다.');
       return;
     }
 
     setUserId(Number(savedUserId));
-  }, []);
+  }, [currentUser.id]);
 
   useEffect(() => {
     if (!userId) {
@@ -67,7 +68,7 @@ export default function FolderListPage() {
     event.preventDefault();
 
     if (!userId) {
-      setMessage('먼저 사용할 프로필을 선택해 주세요.');
+      setMessage('로그인이 필요합니다.');
       return;
     }
 
@@ -167,7 +168,7 @@ export default function FolderListPage() {
               <p>{message}</p>
               <div className="status-actions">
                 <Link className="secondary-button" href="/">
-                  프로필 선택으로 이동
+                  로그인으로 이동
                 </Link>
               </div>
             </div>

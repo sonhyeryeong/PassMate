@@ -1,3 +1,7 @@
+'use client';
+import { useState } from 'react';
+import { logout } from '@/lib/userApi';
+import { getErrorMessage } from '@/lib/apiClient';
 import Link from 'next/link';
 import type { ReactNode } from 'react';
 import { BottomNav } from '@/components/BottomNav';
@@ -20,6 +24,12 @@ const navItems: Array<{ key: NavKey; label: string; href: string }> = [
 ];
 
 export function AppShell({ active, actions, children, eyebrow, title }: AppShellProps) {
+  const [error,setError]=useState('');
+  const [leaving,setLeaving]=useState(false);
+  async function signOut() {
+    setLeaving(true);
+    try { await logout(); } catch(e) {setError(getErrorMessage(e,'로그아웃하지 못했습니다.'));setLeaving(false);}
+  }
   return (
     <div className="app-layout">
       <aside className="sidebar" aria-label="주요 메뉴">
@@ -46,7 +56,7 @@ export function AppShell({ active, actions, children, eyebrow, title }: AppShell
             {eyebrow && <p className="workspace-header__eyebrow">{eyebrow}</p>}
             <h1>{title}</h1>
           </div>
-          {actions && <div className="workspace-header__actions">{actions}</div>}
+          <div className="workspace-header__actions">{actions}<button className="secondary-button" disabled={leaving} onClick={()=>void signOut()} type="button">로그아웃</button>{error&&<p role="alert">{error}</p>}</div>
         </header>
         <main className="workspace-main">{children}</main>
       </div>

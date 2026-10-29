@@ -16,14 +16,15 @@ export default defineConfig({
   webServer: [
     {
       command: `${maven} -q -f ../backend/pom.xml spring-boot:run "-Dspring-boot.run.arguments=--server.port=18080 --spring.datasource.url=jdbc:h2:mem:passmate-e2e --spring.h2.console.enabled=false"`,
-      url: 'http://localhost:18080/api/users',
+      url: 'http://localhost:18080/api/auth/csrf',
+      stdout: 'pipe',
       timeout: 120_000,
       reuseExistingServer: false,
     },
     {
       command: 'npm run dev',
       url: 'http://localhost:3000',
-      env: { NEXT_PUBLIC_API_BASE_URL: 'http://localhost:18080/api' },
+      env: { NEXT_PUBLIC_API_BASE_URL: '/api', PASSMATE_BACKEND_URL: 'http://127.0.0.1:18080' },
       timeout: 120_000,
       reuseExistingServer: false,
     },

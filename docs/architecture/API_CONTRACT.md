@@ -40,8 +40,8 @@ DELETE /api/decks/{deckId}
 ```text
 GET    /api/decks/{deckId}/categories
 POST   /api/decks/{deckId}/categories
-PATCH  /api/categories/{categoryId}
-DELETE /api/categories/{categoryId}
+PATCH  /api/decks/{deckId}/categories/{categoryId}
+DELETE /api/decks/{deckId}/categories/{categoryId}
 ```
 
 ## Material API
@@ -49,9 +49,9 @@ DELETE /api/categories/{categoryId}
 ```text
 GET    /api/categories/{categoryId}/materials
 POST   /api/categories/{categoryId}/materials
-GET    /api/materials/{materialId}
-PATCH  /api/materials/{materialId}
-DELETE /api/materials/{materialId}
+GET    /api/categories/{categoryId}/materials/{materialId}
+PATCH  /api/categories/{categoryId}/materials/{materialId}
+DELETE /api/categories/{categoryId}/materials/{materialId}
 ```
 
 ## FlashCard API
@@ -59,16 +59,16 @@ DELETE /api/materials/{materialId}
 ```text
 GET    /api/materials/{materialId}/cards
 POST   /api/materials/{materialId}/cards
-GET    /api/cards/{cardId}
-PATCH  /api/cards/{cardId}
-DELETE /api/cards/{cardId}
+GET    /api/materials/{materialId}/cards/{cardId}
+PATCH  /api/materials/{materialId}/cards/{cardId}
+DELETE /api/materials/{materialId}/cards/{cardId}
 ```
 
 ## Review API
 
 ```text
 GET  /api/reviews/today
-POST /api/cards/{cardId}/reviews
+POST /api/reviews/cards/{cardId}
 GET  /api/reviews/history
 ```
 
@@ -77,39 +77,46 @@ GET  /api/reviews/history
 현재 구현의 복습 조회 경로를 유지하고 선택적인 `materialId` 필터를 추가한다.
 
 ```text
-GET /api/reviews/users/{userId}/today?materialId={materialId}
+GET /api/reviews/today?materialId={materialId}
 ```
 
 - `materialId` 생략 시 기존 사용자 전체 기한 카드 조회를 유지한다.
 - 지정 시 해당 학습 세트의 기한 카드만 반환하며 기존 `items`, `reviewDate` 응답 구조를 유지한다.
 - 기한 기준은 기존 `date` 파라미터(생략 시 서버 현재 시각)를 유지한다. 해당 시각 이하의 `nextReviewAt`을 포함하고 정렬은 `nextReviewAt`, 카드 ID 오름차순을 유지한다.
 - 세트 존재 여부와 폴더까지의 사용자 소유 관계를 확인한다. 없거나 소유하지 않은 세트는 404로 처리한다. 정상 소유 세트에 기한 카드가 없으면 빈 `items`를 반환한다.
-- 결과 제출 API와 네 단계 일정 정책은 변경하지 않는다. 인증 도입을 이번 변경에 포함하지 않으며 로컬 프로필 ID 방식의 소유 관계 확인과 로그인 인증을 구분한다.
-- 삭제 API는 기존 경로·응답 형식을 유지하며 [데이터 설계의 영구 삭제 정책](DATA_MODEL.md#확정-영구-삭제와-복습-기록-2026-10-29)을 적용한다. 로컬 프로필 기준 소유 관계 확인을 위해 모든 삭제 요청에 `userId` 쿼리가 필요하다. 카드·학습 세트·섹션 삭제 호출자는 이번 변경부터 이 값을 전달해야 한다. 생략하면 400, 대상이 없거나 소유 관계·부모 경로가 맞지 않으면 404이며 성공 시 204이다.
+- 결과 제출과 네 단계 일정 정책은 유지한다. 사용자 식별은 로그인 세션의 Principal을 사용한다.
+- 삭제는 세션 사용자와 부모 경로의 소유 관계를 확인한다. 대상 없음·소유 불일치는 404, 성공은 204이다. `userId` 쿼리는 400으로 거절한다.
 
 ```text
-DELETE /api/materials/{materialId}/cards/{cardId}?userId={userId}
-DELETE /api/categories/{categoryId}/materials/{materialId}?userId={userId}
-DELETE /api/decks/{deckId}/categories/{categoryId}?userId={userId}
-DELETE /api/decks/{deckId}?userId={userId}
+DELETE /api/materials/{materialId}/cards/{cardId}
+DELETE /api/categories/{categoryId}/materials/{materialId}
+DELETE /api/decks/{deckId}/categories/{categoryId}
+DELETE /api/decks/{deckId}
 ```
 
-- 구현 상태: `materialId` 필터와 상위 리소스 삭제의 하위 정리를 구현했다. 위의 이전 Review API 경로 예시는 현재 컨트롤러와 차이가 있으며 이번 변경에서 경로를 대규모 개편하지 않는다.
+## 인증 API (일반 로그인 구현, Google 후속)
 
-## User API
+| 경로 | 동작 |
+| --- | --- |
+| `GET /api/auth/csrf` | `{token, headerName}` 반환. 모든 변경 요청은 해당 헤더와 세션 쿠키 필요 |
+| `POST /api/auth/signup` | JSON `{loginId,nickname,password}`, 성공 201 빈 응답. 자동 로그인하지 않음 |
+| `POST /api/auth/login` | URL 인코딩 폼 `loginId`, `password`. 성공 204 및 세션 ID 교체, 실패 401 |
+| `POST /api/auth/logout` | CSRF 검증 후 세션 무효화, 204 |
+| `GET /api/users/me` | 본인 정보 조회 |
+| `PATCH /api/users/me` | JSON `{nickname}`으로 본인 닉네임 변경 |
 
-MVP1에서는 최소 사용자 정보만 다룬다.
-
-```text
-GET /api/users/me
-```
+- 아이디는 앞뒤 공백 제거·소문자 정규화 후 영문/숫자/밑줄 4~32자, 닉네임은 1~30자다. 비밀번호는 12~64자 및 UTF-8 72바이트 이내이며 공백을 제거하지 않는다.
+- 중복 아이디 409, 잘못된 가입값 400. 가입·로그인 요청은 단일 서버의 접속 IP별 합산 분당 30회로 제한하고 초과 시 429를 반환한다. 프록시 환경에서는 공유 IP 제한의 영향을 배포 전에 검증해야 한다.
+- JDBC 세션 쿠키 `PM_SESSION`은 HttpOnly/SameSite=Lax, 유휴 1시간·로그인 후 최대 24시간이다. 공개 HTTPS 배포 시 Secure 설정과 프록시 검증이 추가로 필요하다.
+- `/auth/csrf`, `/auth/signup`, `/auth/login` 외 API는 로그인 필수다. 이전 사용자 목록·임의 사용자 CRUD와 `/reviews/users/{userId}/...` 경로는 제거했다. 모든 요청의 `userId` 쿼리는 400으로 거절한다.
+- Google OAuth·탈퇴·비밀번호 재설정은 미구현이다. 기존 로컬 프로필에 새 계정을 자동 연결하지 않는다.
 
 ## Review History API
 
 사용자의 복습 기록 화면은 카드, 학습 세트, 폴더 정보를 추가 요청 없이 표시할 수 있는 전용 조회 API를 사용한다.
 
 ```text
-GET /api/reviews/users/{userId}/history
+GET /api/reviews/history
 ```
 
 ```json
@@ -138,10 +145,10 @@ GET /api/reviews/users/{userId}/history
 
 대시보드는 화면에서 여러 도메인 API를 직접 조합하지 않고 전용 집계 API를 사용한다.
 
-MVP1의 로컬 프로필 방식에서는 `userId`를 전달한다.
+서버 세션에서 현재 사용자 ID를 결정한다.
 
 ```text
-GET /api/dashboard?userId={userId}
+GET /api/dashboard
 ```
 
 응답은 사용자 요약, 전체 학습 요약, 학습 방식별 진입 큐를 포함한다.

@@ -1,6 +1,10 @@
 package com.passmate.domain.review.service;
 
 import com.passmate.domain.category.entity.Category;
+import com.passmate.common.security.CurrentUser;
+import com.passmate.common.security.Ownership;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 import com.passmate.domain.category.repository.CategoryRepository;
 import com.passmate.domain.category.service.CategoryService;
 import com.passmate.domain.category.controller.CategoryController;
@@ -199,10 +203,13 @@ class ReviewFlowIntegrationTest {
 
     @ParameterizedTest
     @EnumSource(Scope.class)
-    void deletionApiRequiresProfileAndRejectsUnownedTargets(Scope scope) throws Exception {
-        MockMvc mvc = MockMvcBuilders.standaloneSetup(new DeckController(deckService),
-                        new CategoryController(categoryService), new MaterialController(materialService),
-                        new FlashCardController(flashCardService))
+    void deletionApiRejectsUnownedTargets(Scope scope) throws Exception {
+        CurrentUser current = mock(CurrentUser.class);
+        when(current.id()).thenReturn(outsiderId);
+        Ownership ownership = new Ownership(current, decks, categories, materials, cards, histories);
+        MockMvc mvc = MockMvcBuilders.standaloneSetup(new DeckController(current, deckService),
+                        new CategoryController(current, ownership, categoryService), new MaterialController(current, ownership, materialService),
+                        new FlashCardController(current, ownership, flashCardService))
                 .setControllerAdvice(new GlobalExceptionHandler()).build();
         String path = switch (scope) {
             case CARD -> "/materials/" + target.materials().get(0) + "/cards/" + target.cards().get(0);
@@ -210,11 +217,11 @@ class ReviewFlowIntegrationTest {
             case CATEGORY -> "/decks/" + target.deckId() + "/categories/" + target.categories().get(0);
             case DECK -> "/decks/" + target.deckId();
         };
-        mvc.perform(delete(path)).andExpect(status().isBadRequest());
-        mvc.perform(delete(path).param("userId", Long.toString(outsiderId)))
+        mvc.perform(delete(path))
                 .andExpect(status().isNotFound());
         assertAllDataRemains();
-        mvc.perform(delete(path).param("userId", Long.toString(userId)))
+        when(current.id()).thenReturn(userId);
+        mvc.perform(delete(path))
                 .andExpect(status().isNoContent());
     }
 
@@ -235,9 +242,12 @@ class ReviewFlowIntegrationTest {
 
     @Test
     void filteredReviewApiDistinguishesEmptyMissingAndUnownedSet() throws Exception {
-        MockMvc mvc = MockMvcBuilders.standaloneSetup(new ReviewController(reviewService))
+        CurrentUser current = mock(CurrentUser.class);
+        when(current.id()).thenReturn(userId);
+        Ownership ownership = new Ownership(current, decks, categories, materials, cards, histories);
+        MockMvc mvc = MockMvcBuilders.standaloneSetup(new ReviewController(current, ownership, reviewService))
                 .setControllerAdvice(new GlobalExceptionHandler()).build();
-        String path = "/reviews/users/" + userId + "/today";
+        String path = "/reviews/today";
         mvc.perform(get(path).param("date", NOW.toString()).param("materialId", target.materials().get(0).toString()))
                 .andExpect(status().isOk()).andExpect(jsonPath("$.items.length()").value(2));
         mvc.perform(get(path).param("date", NOW.toString()))

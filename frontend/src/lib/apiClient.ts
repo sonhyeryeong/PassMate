@@ -1,4 +1,4 @@
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL ?? 'http://localhost:8080/api';
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL ?? '/api';
 
 interface ApiErrorResponse {
   code?: string;
@@ -29,10 +29,18 @@ export async function request<T>(path: string, init?: RequestInit): Promise<T> {
     headers.set('Content-Type', 'application/json');
   }
 
+  const method = (init?.method ?? 'GET').toUpperCase();
+  if (!['GET', 'HEAD', 'OPTIONS'].includes(method)) {
+    const csrf = await request<{token: string; headerName: string}>('/auth/csrf');
+    headers.set(csrf.headerName, csrf.token);
+  }
+
   try {
     response = await fetch(`${API_BASE_URL}${path}`, {
       ...init,
       headers,
+      credentials: 'include',
+      cache: 'no-store',
     });
   } catch {
     throw new ApiError(
@@ -42,6 +50,9 @@ export async function request<T>(path: string, init?: RequestInit): Promise<T> {
     );
   }
 
+  if (response.status === 401 && typeof window !== 'undefined' && !path.startsWith('/auth/') && window.location.pathname !== '/login') {
+    window.location.replace('/login');
+  }
   if (!response.ok) {
     const errorResponse = await readErrorResponse(response);
     throw new ApiError(
@@ -51,7 +62,7 @@ export async function request<T>(path: string, init?: RequestInit): Promise<T> {
     );
   }
 
-  if (response.status === 204) {
+  if (response.status === 204 || (response.status === 201 && response.headers.get('Content-Length') === '0')) {
     return undefined as T;
   }
 

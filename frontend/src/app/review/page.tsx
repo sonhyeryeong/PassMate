@@ -9,7 +9,7 @@ import { createReview, getTodayReviewCards } from '@/lib/reviewApi';
 import type { FlashCard } from '@/types/flashcard';
 import type { ReviewResult } from '@/types/review';
 
-const SELECTED_USER_KEY = 'passmate.selectedUser';
+import { useCurrentUser } from '@/components/AuthGate';
 
 type LoadState = 'loading' | 'success' | 'error';
 type SubmitState = 'idle' | 'submitting';
@@ -25,6 +25,7 @@ function ReviewContent({ materialParam, hasDuplicateScope }: {
   materialParam: string | null;
   hasDuplicateScope: boolean;
 }) {
+  const currentUser = useCurrentUser();
   const materialId = materialParam === null ? undefined : Number(materialParam);
   const invalidScope = hasDuplicateScope
     || (materialId !== undefined && (!Number.isSafeInteger(materialId) || materialId <= 0));
@@ -47,16 +48,16 @@ function ReviewContent({ materialParam, hasDuplicateScope }: {
   }, [cards.length, currentIndex]);
 
   useEffect(() => {
-    const savedUserId = window.localStorage.getItem(SELECTED_USER_KEY);
+    const savedUserId = String(currentUser.id);
 
     if (!savedUserId || !Number.isSafeInteger(Number(savedUserId)) || Number(savedUserId) <= 0) {
       setLoadState('error');
-      setMessage('먼저 사용할 프로필을 선택해 주세요.');
+      setMessage('로그인이 필요합니다.');
       return;
     }
 
     setUserId(Number(savedUserId));
-  }, []);
+  }, [currentUser.id]);
 
   useEffect(() => {
     if (invalidScope) {
@@ -143,7 +144,7 @@ function ReviewContent({ materialParam, hasDuplicateScope }: {
           <p>{message}</p>
           <div className="status-actions">
             <Link className="secondary-button" href="/">
-              프로필 선택으로 이동
+              로그인으로 이동
             </Link>
           </div>
         </div>
