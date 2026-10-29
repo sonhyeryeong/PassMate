@@ -8,8 +8,9 @@ import type {
 import type { FlashCard } from '@/types/flashcard';
 import { request } from '@/lib/apiClient';
 
-export async function getTodayReviewCards(userId: number): Promise<FlashCard[]> {
-  const data = await request<TodayReviewResponse>(`/reviews/users/${userId}/today`);
+export async function getTodayReviewCards(userId: number, materialId?: number): Promise<FlashCard[]> {
+  const query = materialId === undefined ? '' : `?materialId=${materialId}`;
+  const data = await request<TodayReviewResponse>(`/reviews/users/${userId}/today${query}`);
   return data.items;
 }
 

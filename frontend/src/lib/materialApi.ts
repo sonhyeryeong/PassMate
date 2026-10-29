@@ -48,8 +48,8 @@ export async function updateMaterial(
   });
 }
 
-export async function deleteMaterial(categoryId: number, materialId: number): Promise<void> {
-  await request<void>(`/categories/${categoryId}/materials/${materialId}`, {
+export async function deleteMaterial(categoryId: number, materialId: number, userId: number): Promise<void> {
+  await request<void>(`/categories/${categoryId}/materials/${materialId}?userId=${userId}`, {
     method: 'DELETE',
   });
 }

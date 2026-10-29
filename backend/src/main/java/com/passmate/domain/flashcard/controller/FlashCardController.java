@@ -46,8 +46,9 @@ public class FlashCardController {
     @DeleteMapping("/{cardId}")
     public ResponseEntity<Void> deleteFlashCard(
             @PathVariable Long materialId,
-            @PathVariable Long cardId) {
-        flashCardService.deleteFlashCard(cardId, materialId);
+            @PathVariable Long cardId,
+            @RequestParam Long userId) {
+        flashCardService.deleteFlashCard(cardId, materialId, userId);
         return ResponseEntity.noContent().build();
     }
 }

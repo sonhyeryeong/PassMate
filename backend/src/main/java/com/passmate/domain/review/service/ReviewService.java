@@ -10,6 +10,7 @@ import com.passmate.domain.review.entity.ReviewHistory;
 import com.passmate.domain.review.entity.ReviewResult;
 import com.passmate.domain.review.repository.ReviewHistoryRepository;
 import com.passmate.domain.user.repository.UserRepository;
+import com.passmate.domain.material.repository.MaterialRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
@@ -28,6 +29,7 @@ public class ReviewService {
     private final ReviewHistoryRepository reviewHistoryRepository;
     private final FlashCardRepository flashCardRepository;
     private final UserRepository userRepository;
+    private final MaterialRepository materialRepository;
 
     public ReviewDto.Response getReview(Long reviewId) {
         ReviewHistory review = reviewHistoryRepository.findById(reviewId)
@@ -86,8 +88,15 @@ public class ReviewService {
                 .build();
     }
 
-    public ReviewDto.TodayReviewResponse getUserTodayReviewCards(Long userId, LocalDateTime date) {
-        List<FlashCard> flashCards = flashCardRepository.findDueCardsByUserId(userId, date);
+    public ReviewDto.TodayReviewResponse getUserTodayReviewCards(Long userId, LocalDateTime date, Long materialId) {
+        List<FlashCard> flashCards;
+        if (materialId == null) {
+            flashCards = flashCardRepository.findDueCardsByUserId(userId, date);
+        } else {
+            materialRepository.findUserMaterial(userId, materialId)
+                    .orElseThrow(() -> new ResourceNotFoundException("MATERIAL_NOT_FOUND", "학습 세트를 찾을 수 없습니다."));
+            flashCards = flashCardRepository.findDueCardsByUserIdAndMaterialId(userId, materialId, date);
+        }
         List<FlashCardDto.Response> items = flashCards.stream()
                 .map(this::toFlashCardResponse)
                 .collect(Collectors.toList());

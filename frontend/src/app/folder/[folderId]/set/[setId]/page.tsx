@@ -123,7 +123,7 @@ export default function StudySetDetailPage() {
   }
 
   async function handleDeleteCards() {
-    if (selectedCardIds.length === 0) {
+    if (selectedCardIds.length === 0 || !folder) {
       return;
     }
 
@@ -135,7 +135,7 @@ export default function StudySetDetailPage() {
 
     for (const cardId of selectedCardIds) {
       try {
-        await deleteFlashCard(setId, cardId);
+        await deleteFlashCard(setId, cardId, folder.userId);
         deletedCardIds.push(cardId);
       } catch (error) {
         deleteError = error;
@@ -175,7 +175,7 @@ export default function StudySetDetailPage() {
             <button className="secondary-button" onClick={() => setEditingCard('new')} type="button">
               카드 추가
             </button>
-            <Link className="submit-button submit-button--fit" href="/review">
+            <Link className="submit-button submit-button--fit" href={`/review?materialId=${setId}`}>
               복습 시작
             </Link>
           </div>

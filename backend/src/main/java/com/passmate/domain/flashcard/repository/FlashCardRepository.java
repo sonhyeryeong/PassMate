@@ -31,6 +31,18 @@ public interface FlashCardRepository extends JpaRepository<FlashCard, Long> {
     );
 
     @Query("""
+            SELECT f FROM FlashCard f, Material m, Category c, Deck d
+            WHERE f.materialId = m.id AND m.categoryId = c.id AND c.deckId = d.id
+              AND d.userId = :userId AND m.id = :materialId AND f.nextReviewAt <= :now
+            ORDER BY f.nextReviewAt ASC, f.id ASC
+            """)
+    List<FlashCard> findDueCardsByUserIdAndMaterialId(
+            @Param("userId") Long userId,
+            @Param("materialId") Long materialId,
+            @Param("now") LocalDateTime now
+    );
+
+    @Query("""
             SELECT COUNT(f)
             FROM FlashCard f, Material m, Category c, Deck d
             WHERE f.materialId = m.id

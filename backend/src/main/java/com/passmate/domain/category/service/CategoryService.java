@@ -3,6 +3,9 @@ package com.passmate.domain.category.service;
 import com.passmate.domain.category.dto.CategoryDto;
 import com.passmate.domain.category.entity.Category;
 import com.passmate.domain.category.repository.CategoryRepository;
+import com.passmate.domain.material.repository.MaterialRepository;
+import com.passmate.domain.material.entity.Material;
+import com.passmate.domain.material.service.MaterialService;
 import com.passmate.domain.error.ResourceNotFoundException;
 import com.passmate.domain.error.InvalidRequestException;
 import lombok.RequiredArgsConstructor;
@@ -17,6 +20,8 @@ import java.util.stream.Collectors;
 public class CategoryService {
 
     private final CategoryRepository categoryRepository;
+    private final MaterialRepository materialRepository;
+    private final MaterialService materialService;
 
     public CategoryDto.Response getCategory(Long categoryId, Long deckId) {
         Category category = categoryRepository.findByIdAndDeckId(categoryId, deckId)
@@ -59,9 +64,13 @@ public class CategoryService {
     }
 
     @Transactional
-    public void deleteCategory(Long categoryId, Long deckId) {
-        Category category = categoryRepository.findByIdAndDeckId(categoryId, deckId)
+    public void deleteCategory(Long categoryId, Long deckId, Long userId) {
+        Category category = categoryRepository.findUserCategory(userId, categoryId)
+                .filter(item -> item.getDeckId().equals(deckId))
                 .orElseThrow(() -> new ResourceNotFoundException("CATEGORY_NOT_FOUND", "기본 섹션을 찾을 수 없습니다."));
+        for (Material material : materialRepository.findByCategoryId(categoryId)) {
+            materialService.deleteMaterial(material.getId(), categoryId, userId);
+        }
         categoryRepository.delete(category);
     }
 

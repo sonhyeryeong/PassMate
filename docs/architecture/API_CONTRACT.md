@@ -72,6 +72,30 @@ POST /api/cards/{cardId}/reviews
 GET  /api/reviews/history
 ```
 
+## 확정: 복습 범위 필터와 영구 삭제 계약 (2026-10-29)
+
+현재 구현의 복습 조회 경로를 유지하고 선택적인 `materialId` 필터를 추가한다.
+
+```text
+GET /api/reviews/users/{userId}/today?materialId={materialId}
+```
+
+- `materialId` 생략 시 기존 사용자 전체 기한 카드 조회를 유지한다.
+- 지정 시 해당 학습 세트의 기한 카드만 반환하며 기존 `items`, `reviewDate` 응답 구조를 유지한다.
+- 기한 기준은 기존 `date` 파라미터(생략 시 서버 현재 시각)를 유지한다. 해당 시각 이하의 `nextReviewAt`을 포함하고 정렬은 `nextReviewAt`, 카드 ID 오름차순을 유지한다.
+- 세트 존재 여부와 폴더까지의 사용자 소유 관계를 확인한다. 없거나 소유하지 않은 세트는 404로 처리한다. 정상 소유 세트에 기한 카드가 없으면 빈 `items`를 반환한다.
+- 결과 제출 API와 네 단계 일정 정책은 변경하지 않는다. 인증 도입을 이번 변경에 포함하지 않으며 로컬 프로필 ID 방식의 소유 관계 확인과 로그인 인증을 구분한다.
+- 삭제 API는 기존 경로·응답 형식을 유지하며 [데이터 설계의 영구 삭제 정책](DATA_MODEL.md#확정-영구-삭제와-복습-기록-2026-10-29)을 적용한다. 로컬 프로필 기준 소유 관계 확인을 위해 모든 삭제 요청에 `userId` 쿼리가 필요하다. 카드·학습 세트·섹션 삭제 호출자는 이번 변경부터 이 값을 전달해야 한다. 생략하면 400, 대상이 없거나 소유 관계·부모 경로가 맞지 않으면 404이며 성공 시 204이다.
+
+```text
+DELETE /api/materials/{materialId}/cards/{cardId}?userId={userId}
+DELETE /api/categories/{categoryId}/materials/{materialId}?userId={userId}
+DELETE /api/decks/{deckId}/categories/{categoryId}?userId={userId}
+DELETE /api/decks/{deckId}?userId={userId}
+```
+
+- 구현 상태: `materialId` 필터와 상위 리소스 삭제의 하위 정리를 구현했다. 위의 이전 Review API 경로 예시는 현재 컨트롤러와 차이가 있으며 이번 변경에서 경로를 대규모 개편하지 않는다.
+
 ## User API
 
 MVP1에서는 최소 사용자 정보만 다룬다.
@@ -175,8 +199,8 @@ GET /api/dashboard?userId={userId}
 - 결제 API
 - 공유 Deck API
 
-## 구현 확인 사항 (2026-10-22)
+## 구현 확인 사항 (2026-10-29)
 
 - 복습 API 서비스는 카드 소유권을 확인한 뒤 결과를 기록하고 `nextReviewAt`을 갱신한다.
-- 사용자 화면의 `복습 시작` 링크는 현재 `/review`로 이동한다. 학습 세트 단위 복습 필터는 구현 확인이 필요하다.
+- 전체 복습은 `/review`, 학습 세트의 `복습 시작`은 `/review?materialId={setId}`로 이동한다. API의 선택적 `materialId` 필터와 세트 소유 관계를 검증했다.
 - 이 문서의 예시 응답과 실제 컨트롤러·DTO 계약이 다를 경우 실제 코드를 우선 파악하고 차이를 보고한 뒤 문서를 수정한다.

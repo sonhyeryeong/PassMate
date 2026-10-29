@@ -3,6 +3,9 @@ package com.passmate.domain.deck.service;
 import com.passmate.domain.deck.dto.DeckDto;
 import com.passmate.domain.deck.entity.Deck;
 import com.passmate.domain.deck.repository.DeckRepository;
+import com.passmate.domain.category.entity.Category;
+import com.passmate.domain.category.repository.CategoryRepository;
+import com.passmate.domain.category.service.CategoryService;
 import com.passmate.domain.error.ResourceNotFoundException;
 import com.passmate.domain.error.InvalidRequestException;
 import lombok.RequiredArgsConstructor;
@@ -17,6 +20,8 @@ import java.util.stream.Collectors;
 public class DeckService {
 
     private final DeckRepository deckRepository;
+    private final CategoryRepository categoryRepository;
+    private final CategoryService categoryService;
 
     public DeckDto.Response getDeck(Long deckId, Long userId) {
         Deck deck = deckRepository.findByIdAndUserId(deckId, userId)
@@ -62,6 +67,9 @@ public class DeckService {
     public void deleteDeck(Long deckId, Long userId) {
         Deck deck = deckRepository.findByIdAndUserId(deckId, userId)
                 .orElseThrow(() -> new ResourceNotFoundException("DECK_NOT_FOUND", "폴더를 찾을 수 없습니다."));
+        for (Category category : categoryRepository.findByDeckIdOrderBySortOrder(deckId)) {
+            categoryService.deleteCategory(category.getId(), deckId, userId);
+        }
         deckRepository.delete(deck);
     }
 

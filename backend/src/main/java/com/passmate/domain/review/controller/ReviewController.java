@@ -38,9 +38,10 @@ public class ReviewController {
     @GetMapping("/users/{userId}/today")
     public ResponseEntity<ReviewDto.TodayReviewResponse> getUserTodayReviews(
             @PathVariable Long userId,
-            @RequestParam(required = false) LocalDateTime date) {
+            @RequestParam(required = false) LocalDateTime date,
+            @RequestParam(required = false) Long materialId) {
         LocalDateTime reviewDate = date != null ? date : LocalDateTime.now();
-        return ResponseEntity.ok(reviewService.getUserTodayReviewCards(userId, reviewDate));
+        return ResponseEntity.ok(reviewService.getUserTodayReviewCards(userId, reviewDate, materialId));
     }
 
     @GetMapping("/users/{userId}/history/today")

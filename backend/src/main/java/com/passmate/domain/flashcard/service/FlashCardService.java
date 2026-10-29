@@ -61,8 +61,9 @@ public class FlashCardService {
     }
 
     @Transactional
-    public void deleteFlashCard(Long flashCardId, Long materialId) {
-        FlashCard flashCard = flashCardRepository.findByIdAndMaterialId(flashCardId, materialId)
+    public void deleteFlashCard(Long flashCardId, Long materialId, Long userId) {
+        FlashCard flashCard = flashCardRepository.findUserFlashCard(userId, flashCardId)
+                .filter(card -> card.getMaterialId().equals(materialId))
                 .orElseThrow(() -> cardNotFound());
         reviewHistoryRepository.deleteByFlashCardId(flashCardId);
         flashCardRepository.delete(flashCard);

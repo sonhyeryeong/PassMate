@@ -8,6 +8,7 @@ import com.passmate.domain.material.repository.MaterialRepository;
 import com.passmate.domain.flashcard.dto.FlashCardDto;
 import com.passmate.domain.flashcard.entity.FlashCard;
 import com.passmate.domain.flashcard.repository.FlashCardRepository;
+import com.passmate.domain.flashcard.service.FlashCardService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -22,6 +23,7 @@ public class MaterialService {
 
     private final MaterialRepository materialRepository;
     private final FlashCardRepository flashCardRepository;
+    private final FlashCardService flashCardService;
 
     public MaterialDto.Response getMaterial(Long materialId, Long categoryId) {
         Material material = materialRepository.findByIdAndCategoryId(materialId, categoryId)
@@ -102,13 +104,16 @@ public class MaterialService {
     }
 
     @Transactional
-    public void deleteMaterial(Long materialId, Long categoryId) {
-        Material material = materialRepository.findByIdAndCategoryId(materialId, categoryId)
+    public void deleteMaterial(Long materialId, Long categoryId, Long userId) {
+        Material material = materialRepository.findUserMaterial(userId, materialId)
+                .filter(item -> item.getCategoryId().equals(categoryId))
                 .orElseThrow(() -> new ResourceNotFoundException(
                         "MATERIAL_NOT_FOUND",
                         "학습 세트를 찾을 수 없습니다."
                 ));
-        flashCardRepository.deleteByMaterialId(materialId);
+        for (FlashCard card : flashCardRepository.findByMaterialId(materialId)) {
+            flashCardService.deleteFlashCard(card.getId(), materialId, userId);
+        }
         materialRepository.delete(material);
     }
 

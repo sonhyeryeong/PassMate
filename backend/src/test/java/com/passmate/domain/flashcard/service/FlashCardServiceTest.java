@@ -128,10 +128,10 @@ class FlashCardServiceTest {
                 .front("질문")
                 .back("답변")
                 .build();
-        when(flashCardRepository.findByIdAndMaterialId(3L, 2L))
+        when(flashCardRepository.findUserFlashCard(1L, 3L))
                 .thenReturn(Optional.of(flashCard));
 
-        flashCardService.deleteFlashCard(3L, 2L);
+        flashCardService.deleteFlashCard(3L, 2L, 1L);
 
         InOrder inOrder = inOrder(reviewHistoryRepository, flashCardRepository);
         inOrder.verify(reviewHistoryRepository).deleteByFlashCardId(3L);
