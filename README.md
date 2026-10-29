@@ -147,7 +147,15 @@ npm.cmd run build
 4. Category 안에 Material 생성
 5. Material 안에 FlashCard 생성
 
-ReviewHistory 도메인과 API 골격은 있지만, 프론트엔드의 복습 화면은 아직 MVP 구현이 더 필요합니다.
+카드 복습 화면에서 정답 공개, 네 단계 결과 저장, 다음 복습일 계산과 기록 조회를 사용할 수 있습니다. 학습 세트에서 복습을 시작하면 해당 세트의 기한 카드만 조회하며, 완료 안내는 이번 목록 기준입니다. 영구 삭제와 복습 범위의 상세 정책은 [사용자 흐름](docs/architecture/USER_FLOW.md) 및 [데이터 설계](docs/architecture/DATA_MODEL.md)를 따릅니다.
+
+### 복습 회귀 검증
+
+백엔드는 저장소 루트에서 `mvn -f backend/pom.xml test`로 검증합니다. 프론트엔드는 `frontend`에서 `npm test`, `npm run type-check`, `npm run lint`, `npm run build`를 실행합니다.
+
+종단 간 테스트는 JDK 17과 Maven이 실행 경로에 있는 환경에서 `frontend`의 `npm run test:e2e`로 실행합니다. 최초 환경에서는 `npm ci` 및 `npx playwright install chromium`으로 테스트 의존성과 브라우저를 준비합니다. Playwright는 실제 Spring API와 Next.js를 실행하며, 전용 메모리 H2 DB를 사용합니다. 기존 로컬 파일 DB는 사용하지 않습니다. 포트 18080과 3000이 사용 중이면 테스트는 기존 서버를 재사용하지 않고 중단합니다.
+
+AI 작업 분류·선택적 독립 검토·CI·행동 평가의 적용 범위와 파일럿 결과는 [AI 개발 운영](docs/AI_WORKFLOW.md)을 참고하세요. 로컬 검증과 원격 CI 실행 결과는 구분합니다.
 
 ## 프로젝트 구조
 

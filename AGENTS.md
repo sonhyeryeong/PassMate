@@ -114,6 +114,9 @@ docs/architecture/
 
 ## 기술별 규칙
 
+- AI 작업 분류와 검증 연결은 `docs/AI_WORKFLOW.md`를 따른다.
+- 복습·삭제 계약을 변경하거나 검토할 때 `.agents/skills/passmate-review/SKILL.md`의 관련 부분을 적용한다. 일반 문구·스타일 수정에는 추가 절차를 붙이지 않는다.
+
 - 백엔드 작업은 `SPRING.md`를 따른다.
 - 프론트엔드 작업은 `FRONTEND.md`를 따른다.
 - API 설계와 응답 형식은 `API_STYLE.md`를 따른다.
