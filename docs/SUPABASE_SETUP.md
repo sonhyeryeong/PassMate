@@ -2,15 +2,15 @@
 
 ## 현재 상태
 
-무료 구성은 화면 Vercel Hobby, Spring 서버 Render Free, DB Supabase Free다. 기본 HTTPS 주소를 사용하고 도메인은 구매하지 않는다. Supabase Auth 대신 Spring에서 아이디·비밀번호와 Google 로그인을 구현할 예정이다.
+무료 구성은 화면 Vercel Hobby, Spring 서버 Render Free, DB Supabase Free다. 기본 HTTPS 주소를 사용하고 도메인은 구매하지 않는다. Supabase Auth 대신 Spring에서 아이디·비밀번호와 Google 로그인을 처리한다.
 
-현재 추가한 것은 **DB 전환 기반**이다. `postgres` 프로필은 localhost에만 바인딩하는 연결 검증용이며, 인증 없는 현재 앱을 공개 배포하는 설정이 아니다. 로그인·사용자 격리·배포 프록시·버전 점검을 완료한 뒤 배포 설정을 추가한다.
+일반·Google 로그인은 설정된 DB에 서버 세션을 보관한다. 로컬 `postgres` 프로필은 localhost에서 실행하고, 테스트 배포는 `postgres,staging`과 고정 HTTPS 앱 주소를 사용한다. 실제 외부 호스팅에서의 Google 왕복 검증은 남아 있다.
 
 - 기본 실행은 기존 H2 파일을 계속 사용하며 Flyway가 실행되지 않는다.
 - `postgres` 프로필은 필수 환경변수로 PostgreSQL에 접속한다. 값이 없으면 H2로 대체하지 않고 실패한다.
 - Flyway가 별도 `passmate` 스키마에 현재 학습 테이블과 외래키를 생성한다. Hibernate는 스키마를 자동 변경하지 않고 검증한다.
 - Supabase의 `public` 스키마나 `auth.users`는 사용하지 않는다. `passmate`를 Data API 노출 스키마에 추가하지 않는다.
-- V1의 이메일 필수 조건은 현재 코드와 맞춘 것이다. 인증 구현 단계에서 후속 SQL로 변경하고 자격 정보·세션 테이블을 추가한다. 이미 적용한 SQL은 수정하지 않는다.
+- V1은 학습 테이블, V2는 이메일 선택화와 일반 로그인, V3는 JDBC 세션, V4는 Google 계정 연결에 해당한다. 기존 데이터는 후속 마이그레이션으로 업그레이드한다.
 - 기존 H2 자료를 복사하거나 삭제하지 않는다. 데이터가 이미 들어 있는 DB를 임의로 baseline 처리하지 않는다.
 
 ## 사용자 작업 필요
@@ -62,7 +62,7 @@ mvn -f backend/pom.xml spring-boot:run
 
 ### 4. 이후 배포 설정
 
-인증 구현이 끝나면 Vercel Hobby·Render Free 계정 및 Google OAuth Client를 설정한다. 아직 앱을 배포하거나 운영 DB 자격 증명을 프론트엔드 환경변수에 넣지 않는다. 구체적인 callback URL과 배포 변수는 인증 구현 후 확정한다.
+인증 구현이 끝나면 Vercel Hobby·Render Free 계정 및 Google OAuth Client를 설정한다. 아직 앱을 배포하거나 운영 DB 자격 증명을 프론트엔드 환경변수에 넣지 않는다. 로컬 callback 주소와 서버 변수는 아래 Google 로그인 설정을 따른다.
 
 ## 자동 검증
 
@@ -95,3 +95,29 @@ CI에는 PostgreSQL 17 임시 서비스와 해당 환경변수를 설정했다. 
 - `-SecretsPath`로 다른 로컬 YAML 경로를 지정할 수 있다. `-CheckOnly`는 파일 존재와 실행 환경만 확인하며 YAML 내용·DB 인증을 검증하지 않는다.
 - `-Diagnose`는 Spring을 사용하지 않는 별도 JDBC 진단이므로 기존처럼 비밀번호를 직접 입력한다.
 - 배포에서는 이 Windows 실행 스크립트나 로컬 YAML을 복사하지 않는다. 호스팅 서비스에 `PASSMATE_DB_URL`, `PASSMATE_DB_USERNAME`, `PASSMATE_DB_PASSWORD`를 등록한다. 공개 서버 바인딩·HTTPS·쿠키 등 배포 설정은 별도로 완료해야 한다.
+
+## Google 로그인 설정
+
+1. [Google Cloud Console](https://console.cloud.google.com/auth/clients)에서 웹 애플리케이션용 OAuth 클라이언트를 만든다. 테스트 모드라면 사용할 Google 계정을 테스트 사용자로 등록한다.
+2. 승인된 리디렉션 URI에 `http://localhost:3000/api/login/oauth2/code/google`를 정확히 등록한다. 브라우저는 Next.js 주소로 돌아온 뒤 같은 출처의 프록시를 통해 Spring에 요청한다.
+3. 기존 `backend/.local/application-local.yml`에 아래 항목을 추가하고 백엔드를 재시작한다. 배포 시 같은 이름의 서버 환경변수를 사용한다.
+
+```yaml
+PASSMATE_GOOGLE_ENABLED: true
+PASSMATE_GOOGLE_CLIENT_ID: '<Google에서 발급한 클라이언트 ID>'
+PASSMATE_GOOGLE_CLIENT_SECRET: '<Google에서 발급한 클라이언트 보안 비밀>'
+PASSMATE_APP_ORIGIN: 'http://localhost:3000'
+```
+
+4. 로그인 → Google 선택 → 첫 닉네임 등록 → 학습 세트 생성 → 로그아웃 → 같은 Google 계정으로 로그인해 만든 세트 확인. Google 동의 화면에서 취소한 경우에도 일반 로그인과 재시도가 가능해야 한다.
+5. 테스트 배포 시 테스트용 OAuth 클라이언트에 실제 HTTPS 앱 주소의 `/api/login/oauth2/code/google`를 등록하고 `PASSMATE_APP_ORIGIN`을 그 앱의 출처로 지정한다. 휴면 후 첫 로그인과 쿠키·로그아웃을 확인한다.
+
+`postgres` 프로필의 다음 기동 시 V4가 적용된다. 학습 테이블을 변경하지 않고 Google 사용자 연결 테이블을 추가한다. 기본값에서는 Google 로그인 버튼이 숨겨지고 일반 로그인을 사용할 수 있다.
+
+## 테스트 배포
+
+- 백엔드는 `backend`를 Docker 빌드 루트로 사용한다. `backend/.dockerignore`는 빌드에 필요한 Maven 설정과 애플리케이션 소스만 포함한다.
+- Docker 이미지의 기본 프로필은 `postgres,staging`이다. Render 테스트 서비스에 테스트용 DB 환경변수와 Google 로그인 설정을 등록한다. 인증서 파일은 호스팅의 비공개 파일로 공급하고 JDBC 주소에서 그 경로를 지정한다. V4는 해당 DB에서 다음 기동 시 적용된다.
+- Vercel 프로젝트의 루트는 `frontend`, 서버 전용 `PASSMATE_BACKEND_URL`은 Render 테스트 서비스의 HTTPS 주소다. 브라우저는 같은 출처의 `/api`를 사용한다. Google 클라이언트 비밀과 DB 접속정보는 백엔드에만 등록한다.
+- 테스트 앱의 고정 HTTPS 출처를 `PASSMATE_APP_ORIGIN`에 넣는다. Spring은 그 출처의 브라우저 요청을 허용하고 같은 주소로 OAuth 콜백을 만든다. HTTPS 세션 쿠키는 `__Host-PM_SESSION`을 사용한다.
+- 배포 후 실제 Google 계정으로 신규 가입 → 세트 생성 → 로그아웃 → 같은 계정 재로그인 → 세트 확인을 검사한다. 다른 계정으로 해당 세트 접근 시 거부되는지, 서버 휴면 후에도 왕복이 완료되는지 확인한다.

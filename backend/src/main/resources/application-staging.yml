@@ -1,0 +1,15 @@
+# PostgreSQL 테스트 배포 시 postgres,staging 순서로 활성화한다.
+server:
+  address: 0.0.0.0
+  port: ${PORT:8080}
+  servlet:
+    session:
+      cookie:
+        name: __Host-PM_SESSION
+        secure: true
+        http-only: true
+        same-site: lax
+        path: /
+
+passmate:
+  app-origin: ${PASSMATE_APP_ORIGIN}
