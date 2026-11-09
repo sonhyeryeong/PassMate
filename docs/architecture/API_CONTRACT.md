@@ -94,7 +94,7 @@ DELETE /api/decks/{deckId}/categories/{categoryId}
 DELETE /api/decks/{deckId}
 ```
 
-## 인증 API (일반 로그인 구현, Google 후속)
+## 인증 API (일반 로그인 및 Google)
 
 | 경로 | 동작 |
 | --- | --- |
@@ -107,9 +107,12 @@ DELETE /api/decks/{deckId}
 
 - 아이디는 앞뒤 공백 제거·소문자 정규화 후 영문/숫자/밑줄 4~32자, 닉네임은 1~30자다. 비밀번호는 12~64자 및 UTF-8 72바이트 이내이며 공백을 제거하지 않는다.
 - 중복 아이디 409, 잘못된 가입값 400. 가입·로그인 요청은 단일 서버의 접속 IP별 합산 분당 30회로 제한하고 초과 시 429를 반환한다. 프록시 환경에서는 공유 IP 제한의 영향을 배포 전에 검증해야 한다.
-- JDBC 세션 쿠키 `PM_SESSION`은 HttpOnly/SameSite=Lax, 유휴 1시간·로그인 후 최대 24시간이다. 공개 HTTPS 배포 시 Secure 설정과 프록시 검증이 추가로 필요하다.
+- JDBC 세션 쿠키 `PM_SESSION`은 HttpOnly/SameSite=Lax, 두 로그인 방식 모두 마지막 사용 후 30일까지 유효하다. 인증된 API 요청 시 서버 세션과 브라우저 쿠키 만료를 함께 연장한다. 로그아웃은 즉시 세션을 폐기한다. 테스트 배포는 Secure 속성과 `__Host-PM_SESSION`을 사용한다.
 - `/auth/csrf`, `/auth/signup`, `/auth/login` 외 API는 로그인 필수다. 이전 사용자 목록·임의 사용자 CRUD와 `/reviews/users/{userId}/...` 경로는 제거했다. 모든 요청의 `userId` 쿼리는 400으로 거절한다.
-- Google OAuth·탈퇴·비밀번호 재설정은 미구현이다. 기존 로컬 프로필에 새 계정을 자동 연결하지 않는다.
+- `GET /api/auth/google`은 로그인 화면에 사용 가능 여부 `{enabled}`를 반환한다.
+- 활성화 시 `GET /api/oauth2/authorization/google`로 시작해 `GET /api/login/oauth2/code/google`로 돌아온다. 성공하면 기존 회원은 대시보드, 최초 방문은 `/signup/google`로 이동한다. 실패·취소 시 `/login?google=failed`로 이동한다.
+- 최초 방문의 `POST /api/auth/google/onboarding`은 JSON `{nickname}`과 CSRF 헤더를 받는다. 서버에 저장된 가입 대기는 10분 동안 유효하다. 성공 시 새 로그인 세션과 204, 잘못된 닉네임 400, 대기 없음·만료 401, CSRF 누락 403. 가입 전에는 학습 API에 접근할 수 없다.
+- 탈퇴·비밀번호 재설정은 후속 작업이다. 기존 로컬 프로필에 새 계정을 자동 연결하지 않는다.
 
 ## Review History API
 

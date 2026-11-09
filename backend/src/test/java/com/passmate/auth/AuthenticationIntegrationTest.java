@@ -98,15 +98,27 @@ class AuthenticationIntegrationTest {
   assertEquals(204,owner.write(delete("/decks/"+deck)).getResponse().getStatus());
   assertEquals(0,body(owner.call(get("/reviews/history"))).get("items").size());
  }
- @Test void sessionIsRejectedAfterAbsoluteLifetime() throws Exception {
-  var client=new Client();client.loginAs(client.register());
+ @Test void nextDayVisitRenewsCookieAndThirtyDaysOfInactivityEndsLogin() throws Exception {
+  var client=new Client();
+  String login=client.register();
+  var loggedIn=client.write(post("/auth/login").param("loginId",login).param("password",PASSWORD));
+  assertEquals(204,loggedIn.getResponse().getStatus());
+  assertTrue(loggedIn.getResponse().getHeader("Set-Cookie").contains("Max-Age=2592000"));
   String sessionId=new String(java.util.Base64.getDecoder().decode(client.cookie),java.nio.charset.StandardCharsets.UTF_8);
   var session=sessions.findById(sessionId);
-  assertNotNull(session);
-  ((org.springframework.session.Session) session).setAttribute("authenticatedAt",System.currentTimeMillis()-86400001L);
+  org.springframework.session.Session record=session;
+  assertEquals(java.time.Duration.ofDays(30),record.getMaxInactiveInterval());
+  record.setLastAccessedTime(java.time.Instant.now().minus(java.time.Duration.ofDays(29)));
+  sessions.save(session);
+  var revisit=client.call(get("/users/me"));
+  assertEquals(200,revisit.getResponse().getStatus());
+  assertTrue(revisit.getResponse().getHeader("Set-Cookie").contains("Max-Age=2592000"));
+  session=sessions.findById(sessionId);
+  record=session;
+  assertTrue(record.getLastAccessedTime().isAfter(java.time.Instant.now().minusSeconds(60)));
+  record.setLastAccessedTime(java.time.Instant.now().minus(java.time.Duration.ofDays(31)));
   sessions.save(session);
   assertEquals(401,client.call(get("/users/me")).getResponse().getStatus());
-  assertNull(sessions.findById(sessionId));
  }
  @Test void weakPasswordsAreRejectedAndAuthRequestsAreBounded() throws Exception {
   var client=new Client();

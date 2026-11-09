@@ -34,6 +34,7 @@ server:
     session:
       cookie:
         name: PM_SESSION
+        max-age: 30d
         http-only: true
         same-site: lax
 
@@ -43,3 +44,10 @@ logging:
     com.passmate: DEBUG
   pattern:
     console: "%d{HH:mm:ss.SSS} %clr(%-5level) %clr([%15.15thread]){faint} %clr(%-36.36logger{36}){cyan} : %msg%n"
+
+passmate:
+  app-origin: ${PASSMATE_APP_ORIGIN:http://localhost:3000}
+  google:
+    enabled: ${PASSMATE_GOOGLE_ENABLED:false}
+    client-id: ${PASSMATE_GOOGLE_CLIENT_ID:}
+    client-secret: ${PASSMATE_GOOGLE_CLIENT_SECRET:}

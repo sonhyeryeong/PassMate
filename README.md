@@ -2,7 +2,7 @@
 
 PassMate는 학습 자료를 Deck, Category, Material, FlashCard로 정리하고 반복 복습하는 개인 학습용 PWA입니다.
 
-현재 단계는 MVP1이며, 아이디·비밀번호 회원가입과 서버 세션 로그인으로 동작합니다. Google 로그인과 외부 배포는 후속 작업입니다.
+현재 단계는 MVP1이며, 아이디·비밀번호 회원가입과 서버 세션 로그인으로 동작합니다. Google 로그인은 서버에 OAuth 클라이언트를 설정하면 사용할 수 있습니다. [Google 로그인 설정](docs/SUPABASE_SETUP.md#google-로그인-설정)을 참고하세요.
 
 ## 기술 스택
 
@@ -229,7 +229,7 @@ git config --global --add safe.directory D:/workspace/PassMate
 
 ## 설계 문서 안내
 
-- [외부 공개 베타 설계안](docs/architecture/PUBLIC_BETA_DESIGN.md): 아이디·비밀번호 + Google 로그인, 재설정 후속으로 범위 확정. Vercel·Render·Supabase 무료 구성을 선택했습니다. DB 전환 기반과 일반 인증·사용자 격리를 구현했으며 Google 인증·외부 배포는 미완료입니다.
+- [외부 공개 베타 설계안](docs/architecture/PUBLIC_BETA_DESIGN.md): 아이디·비밀번호 + Google 로그인, 재설정 후속으로 범위 확정. Vercel·Render·Supabase 무료 구성을 선택했습니다. DB 전환 기반과 일반 인증·사용자 격리를 구현했으며 Google 인증을 테스트용 제공자로 검증했습니다. 실제 Google 계정·외부 배포 검증은 남아 있습니다.
 - [Supabase 연결 준비](docs/SUPABASE_SETUP.md): 무료 프로젝트 생성과 로컬 PostgreSQL 연결 검증 절차입니다.
 
 - [제품 비전](docs/PRODUCT_VISION.md): 장기 기억 유지와 기능 도입 기준

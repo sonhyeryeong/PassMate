@@ -57,6 +57,7 @@ class PostgresMigrationTest {
             assertEquals("기존 폴더", jdbc.queryForObject("SELECT name FROM auth_upgrade_test.decks WHERE user_id=?", String.class, userId));
             assertEquals(0, jdbc.queryForObject("SELECT count(*) FROM auth_upgrade_test.local_credentials", Integer.class));
             assertEquals(0, jdbc.queryForObject("SELECT count(*) FROM auth_upgrade_test.spring_session", Integer.class));
+            assertEquals(0, jdbc.queryForObject("SELECT count(*) FROM auth_upgrade_test.auth_identities", Integer.class));
             jdbc.update("INSERT INTO auth_upgrade_test.users(nickname) VALUES ('이메일 없는 새 사용자')");
         } finally {
             jdbc.execute("DROP SCHEMA IF EXISTS auth_upgrade_test CASCADE");

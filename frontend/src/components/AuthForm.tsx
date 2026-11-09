@@ -1,6 +1,7 @@
  'use client';
 import Link from 'next/link';
 import { useEffect, useState, type FormEvent } from 'react';
+import { GoogleLoginLink } from '@/components/GoogleLoginLink';
 import { login, signup } from '@/lib/userApi';
 import { getErrorMessage } from '@/lib/apiClient';
 export function AuthForm({register=false}: {register?:boolean}) {
@@ -26,5 +27,5 @@ export function AuthForm({register=false}: {register?:boolean}) {
  {register&&<><p>비밀번호는 12~64자, UTF-8 기준 72바이트 이내로 입력해 주세요.</p><label>비밀번호 확인<input required type="password" autoComplete="new-password" value={confirm} onChange={e=>setConfirm(e.target.value)}/></label><p>현재 비밀번호 찾기·재설정을 지원하지 않습니다. 비밀번호를 잊으면 이 계정에 다시 로그인할 수 없습니다.</p></>}
  {error&&<p role="alert">{error}</p>}
  <button className="submit-button" disabled={busy} type="submit">{busy?'처리 중…':register?'가입하기':'로그인'}</button>
- </fieldset></form><p><Link href={register?'/login':'/signup'}>{register?'로그인으로 이동':'회원가입'}</Link></p></main>;
+ </fieldset></form>{!register && <GoogleLoginLink />}<p><Link href={register?'/login':'/signup'}>{register?'로그인으로 이동':'회원가입'}</Link></p></main>;
 }

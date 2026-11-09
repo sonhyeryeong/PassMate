@@ -4,3 +4,9 @@ PASSMATE_DB_URL: 'jdbc:postgresql://<SESSION_POOLER_HOST>:5432/postgres?sslmode=
 PASSMATE_DB_USERNAME: '<SESSION_POOLER_USERNAME>'
 # 작은따옴표가 포함된 비밀번호는 작은따옴표를 두 번 써서 표현한다.
 PASSMATE_DB_PASSWORD: ''
+
+# Google 로그인을 사용할 때만 실제 로컬 설정 파일에 등록한다.
+PASSMATE_GOOGLE_ENABLED: false
+PASSMATE_GOOGLE_CLIENT_ID: ''
+PASSMATE_GOOGLE_CLIENT_SECRET: ''
+PASSMATE_APP_ORIGIN: 'http://localhost:3000'

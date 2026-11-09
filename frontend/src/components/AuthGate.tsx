@@ -12,7 +12,7 @@ export function useCurrentUser(): User {
 }
 export function AuthGate({children}: {children:ReactNode}) {
  const pathname=usePathname();
- const publicPage=pathname==='/login'||pathname==='/signup';
+ const publicPage=pathname==='/login'||pathname==='/signup'||pathname==='/signup/google';
  const [user,setUser]=useState<User|null>(null);
  const [error,setError]=useState('');
  useEffect(()=>{

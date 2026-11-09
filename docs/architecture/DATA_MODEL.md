@@ -55,11 +55,11 @@ User 1 ─ N ReviewHistory
 - createdAt
 - updatedAt
 
-## 외부 공개 인증 데이터 (2026-10-29, 일반 인증 구현)
+## 외부 공개 인증 데이터 (2026-11-09, 일반·Google 인증 구현)
 
 - User의 id는 학습 데이터 소유자이며 두 로그인 방식에 공통으로 사용한다. 일반 가입에 이메일을 요구하지 않으므로 V2에서 User.email의 NOT NULL을 해제하고 UNIQUE는 유지했다.
 - 일반 가입자는 `LocalCredential(userId, loginId, passwordHash)`를 갖는다. userId와 정규화한 loginId는 각각 유일해야 하며 비밀번호 원문·비밀번호 확인 값은 저장하지 않는다.
-- 후속 Google 가입자는 `AuthIdentity(userId, issuer, subject)`로 식별한다. `(issuer, subject)`가 유일하며 Google 전용 계정에는 일반 로그인 자격 정보를 생성하지 않는다.
+- V4의 Google 가입자는 `AuthIdentity(userId, issuer, subject)`로 식별한다. `(issuer, subject)`가 유일하며 Google 전용 계정에는 일반 로그인 자격 정보를 생성하지 않는다. auth_identities의 user_id는 users를 참조하며 유일하다. 닉네임 입력 완료 시 사용자와 연결 정보를 같은 트랜잭션에서 저장한다.
 - 닉네임·이메일을 계정 자동 병합의 기준으로 사용하지 않는다. 초기에는 서로 다른 방식으로 각각 가입한 계정을 별도로 유지한다.
 - 재설정 토큰·복구 코드·이메일 인증 토큰 테이블은 초기 범위에 추가하지 않는다. 비밀번호는 BCrypt 비용 12로 해시한다. V3의 Spring Session JDBC 테이블에 세션을 저장한다.
 
